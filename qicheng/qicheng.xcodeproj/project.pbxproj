@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		EA1EC31D1838B60F00F46176 /* CLoginInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1EC31C1838B60F00F46176 /* CLoginInfo.m */; };
+		EA1EC3231838FA5300F46176 /* bg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1EC3221838FA5300F46176 /* bg3.jpg */; };
 		EA203AEB183133F4000B08C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEA183133F4000B08C3 /* Foundation.framework */; };
 		EA203AED183133F4000B08C3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEC183133F4000B08C3 /* CoreGraphics.framework */; };
 		EA203AEF183133F4000B08C3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEE183133F4000B08C3 /* UIKit.framework */; };
@@ -24,7 +25,6 @@
 		EA6E4C7B1837A7AF00202A38 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6E4C781837A7AF00202A38 /* AsyncSocket.m */; };
 		EA6E4C7C1837A7AF00202A38 /* AsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6E4C7A1837A7AF00202A38 /* AsyncUdpSocket.m */; };
 		EA6E4C7E1837BA4B00202A38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6E4C7D1837BA4B00202A38 /* CFNetwork.framework */; };
-		EA6E4C811837DBED00202A38 /* bg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA6E4C801837DBED00202A38 /* bg3.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +40,7 @@
 /* Begin PBXFileReference section */
 		EA1EC31B1838B60F00F46176 /* CLoginInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CLoginInfo.h; path = Login/CLoginInfo.h; sourceTree = "<group>"; };
 		EA1EC31C1838B60F00F46176 /* CLoginInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CLoginInfo.m; path = Login/CLoginInfo.m; sourceTree = "<group>"; };
+		EA1EC3221838FA5300F46176 /* bg3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg3.jpg; path = Resource/bg3.jpg; sourceTree = "<group>"; };
 		EA203AE7183133F4000B08C3 /* qicheng.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = qicheng.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA203AEA183133F4000B08C3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		EA203AEC183133F4000B08C3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -63,7 +64,6 @@
 		EA6E4C791837A7AF00202A38 /* AsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AsyncUdpSocket.h; path = AsyncSocket/AsyncUdpSocket.h; sourceTree = "<group>"; };
 		EA6E4C7A1837A7AF00202A38 /* AsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AsyncUdpSocket.m; path = AsyncSocket/AsyncUdpSocket.m; sourceTree = "<group>"; };
 		EA6E4C7D1837BA4B00202A38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		EA6E4C801837DBED00202A38 /* bg3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg3.jpg; path = ../../../iPhone/res/bg3.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,7 +190,7 @@
 		EA6E4C7F1837DBDA00202A38 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
-				EA6E4C801837DBED00202A38 /* bg3.jpg */,
+				EA1EC3221838FA5300F46176 /* bg3.jpg */,
 			);
 			name = Resource;
 			sourceTree = "<group>";
@@ -270,7 +270,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EA6E4C811837DBED00202A38 /* bg3.jpg in Resources */,
+				EA1EC3231838FA5300F46176 /* bg3.jpg in Resources */,
 				EA203AF5183133F4000B08C3 /* InfoPlist.strings in Resources */,
 				EA203AFD183133F4000B08C3 /* Images.xcassets in Resources */,
 			);
