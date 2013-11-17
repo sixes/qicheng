@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "CLoginInfo.h"
 
 @implementation AppDelegate
 
@@ -39,7 +40,7 @@
         
     }
    //
-    [_socket writeData:[@"$011234y#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+    [_socket writeData:[@"$011234s#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
     return YES;
 }
 
@@ -72,11 +73,42 @@
 
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    NSString *msg = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
     
     NSLog(@"%s %d,msg = %@",__FUNCTION__,__LINE__,msg);
     
-    [_socket readDataWithTimeout:-1 tag:0];
+
+    if ( NSOrderedSame == [ msg compare:@"!" options:NSLiteralSearch range:NSMakeRange(0,1)])
+    {
+      //  if ( NSOrderedSame == [[CLoginInfo shareLoginInfo].loginModuleIdx compare:msg options:NSCaseInsensitiveSearch range:NSMakeRange(1, 2)])
+        if ( NSOrderedSame == [ msg compare:[CLoginInfo shareLoginInfo].loginModuleIdx options:NSNumericSearch range:NSMakeRange(1, 2)])
+        {
+            NSString *size = [msg substringWithRange:NSMakeRange(3, 2)];
+            NSLog(@"data size:%d",[size intValue]);
+            
+            
+            NSData *szData = [size dataUsingEncoding:NSASCIIStringEncoding];
+            Byte * szBytes = (Byte *)[szData bytes];
+            int total = 0;
+            for (int i = 0; i != [szData length]; ++i)
+            {
+                switch ( szBytes[i] )
+                {
+                    case 'f':
+                        total += 15 * pow(16.0, [szData length] - i - 1);
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+            
+        }
+    }
+    else
+    {
+        [_socket readDataWithTimeout:-1 tag:0];
+    }
 }
 
 - (void)onSocketDidDisconnect:(AsyncSocket *)sock

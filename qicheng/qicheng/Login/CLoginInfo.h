@@ -12,12 +12,14 @@
 {
     NSString *_strDomain;
     NSString *_strIp;
+    NSString *_strModuleIdx;
     NSString *_strPassword;
     NSString *_strProt;
 }
 
 @property (nonatomic,copy) NSString *loginDomain;
 @property (nonatomic,copy) NSString *loginIp;
+@property (nonatomic,copy) NSString *loginModuleIdx;
 @property (nonatomic,copy) NSString *loginPasswod;
 @property (nonatomic,copy) NSString *loginPort;
 

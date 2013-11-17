@@ -12,6 +12,7 @@
 
 @synthesize loginDomain     = _strDomain;
 @synthesize loginIp         = _strIp;
+@synthesize loginModuleIdx  = _strModuleIdx;
 @synthesize loginPasswod    = _strPassword;
 @synthesize loginPort       = _strProt;
 
