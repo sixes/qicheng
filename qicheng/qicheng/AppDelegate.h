@@ -26,11 +26,12 @@
 
 @property (assign) CGFloat height;
 @property (assign) CGFloat width;
-@property (assign,retain) NSMutableData *readData;
+@property (nonatomic,retain) NSMutableData *readData;
 
 @property (strong, nonatomic) UIWindow *window;
 
 + (AppDelegate*) shareAppDelegate;
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;
 - (void)didReceiveData:(NSMutableData *)data;
+- (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData;
 @end

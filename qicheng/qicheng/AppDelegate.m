@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "CLoginInfo.h"
+#import "Config.h"
 
 @implementation AppDelegate
 
@@ -34,7 +35,7 @@
 
         
         _bConnected = [_socket isConnected];
-        NSLog(@"@%",[_socket isConnected]);
+       // NSLog(@"@%",[_socket isConnected]);
         [_socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
         
        // [_socket writeData:[@"123" dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0 ];
@@ -42,7 +43,9 @@
         
     }
    //
-    [_socket writeData:[@"$011234s#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+   // [_socket writeData:[@"$011234s#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+    [_socket writeData:[@"$011234a00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+    [_socket writeData:[@"$011234b00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
     return YES;
 }
 
@@ -77,7 +80,35 @@
 {
     NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
     
-    NSLog(@"%s %d,receive msg = %@",__FUNCTION__,__LINE__,msg);
+    NSLog(@"%s %d,receive data: %@",__FUNCTION__,__LINE__,msg);
+    
+    NSUInteger functionNameIdx = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + LENGTH_DATA_LENGTH;
+    NSString *functionName = [msg substringWithRange:NSMakeRange(functionNameIdx, LENGTH_FUNCTION_NAME)];
+    NSString *realData = [msg substringWithRange:NSMakeRange(functionNameIdx + 1, [msg length] - functionNameIdx - 1 - [RPOTOCOL_TAIL length])];
+    [self didReceiveDataWithFunctionName:functionName data:realData];
+}
+
+- (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData
+{
+    NSLog(@"f:%s,l:%d,functionName:%@,data:%@",__FUNCTION__,__LINE__,name,aData);
+    
+    if ( [name length] < 1 )
+    {
+        assert(false);
+        return ;
+    }
+    const char * fName = [name UTF8String];
+    switch ( fName[0] )
+    {
+        case FUNCTION_NAME_INCORRECT_INSTRUCTION:
+            assert(false);
+            break;
+        case FUNCTION_NAME_INCORRECT_PASSWORD:
+            assert(false);
+            break;
+        default:
+            break;
+    }
 }
 
 - (void)onSocket:(AsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
@@ -92,6 +123,8 @@
     
     NSLog(@"%s %d,msg = %@",__FUNCTION__,__LINE__,msg);
     
+    NSString *msgDelegate = [[NSString alloc] initWithData:[AppDelegate shareAppDelegate].readData encoding:NSASCIIStringEncoding];
+    NSLog(@"delegateData:%@",msgDelegate);
 
     BOOL bWait2Read = YES;
     if ( NSOrderedSame == [msg compare:@"!" options:NSLiteralSearch range:NSMakeRange(0,1)])
@@ -108,34 +141,42 @@
             NSUInteger totalLength = dataLength + 3 + 2 + 1;
             NSUInteger leftLength = totalLength - [data length];
 
-            //NSMutableData* allData = [NSMutableData dataWithLength:totalLength];
-            //[allData appendData:data];
-
-            [AppDelegate shareAppDelegate].readData = [[NSMutableData initWithLength:totalLength] autorelease];
+            
+            [AppDelegate shareAppDelegate].readData = [[[NSMutableData alloc]initWithCapacity:totalLength] autorelease];
             [[AppDelegate shareAppDelegate].readData appendData:data];
-            [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
-            // NSData *szData = [size dataUsingEncoding:NSASCIIStringEncoding];
-            // Byte * szBytes = (Byte *)[szData bytes];
-            // int total = 0;
-            // for (int i = 0; i != [szData length]; ++i)
-            // {
-            //     switch ( szBytes[i] )
-            //     {
-            //         case 'f':
-            //             total += 15 * pow(16.0, [szData length] - i - 1);
-            //             break;
-                        
-            //         default:
-            //             break;
-            //     }
-            // }
+            
+            if ( leftLength > 0 )
+            {
+                
+                NSString *readData = [[NSString alloc] initWithData:[AppDelegate shareAppDelegate].readData encoding:NSASCIIStringEncoding];
+                NSLog(@"data is .....%@",readData);
+                
+                
+                [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
+            }
+            else
+            {
+                //读完数据了
+                [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+                
+                //waiting for next package
+                [_socket readDataWithTimeout:-1 tag:0];
+            }
             
         }
     }
-    //it should not come here
-    assert(false);
-    if ( bWait2Read )
+    else if ( NSOrderedSame == [msg compare:@"#" options:NSLiteralSearch range:NSMakeRange([data length] - 1, 1)] )
     {
+        //读完数据了
+        [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+        
+        //waiting for next package
+        [_socket readDataWithTimeout:-1 tag:0];
+    }
+    else
+    {
+        //有可能跑到这里吗？如果数据长的话，可能会多次才能读完
+        assert(false);
         [_socket readDataWithTimeout:-1 tag:0];
     }
 }

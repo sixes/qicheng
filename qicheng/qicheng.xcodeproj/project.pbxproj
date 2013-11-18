@@ -38,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA1C6CCB183A73C200F9C4D8 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		EA1EC31B1838B60F00F46176 /* CLoginInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CLoginInfo.h; path = Login/CLoginInfo.h; sourceTree = "<group>"; };
 		EA1EC31C1838B60F00F46176 /* CLoginInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CLoginInfo.m; path = Login/CLoginInfo.m; sourceTree = "<group>"; };
 		EA1EC3221838FA5300F46176 /* bg3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg3.jpg; path = Resource/bg3.jpg; sourceTree = "<group>"; };
@@ -91,6 +92,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EA1C6CCA183A738200F9C4D8 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				EA1C6CCB183A73C200F9C4D8 /* Config.h */,
+			);
+			name = Config;
+			sourceTree = "<group>";
+		};
 		EA203ADE183133F4000B08C3 = {
 			isa = PBXGroup;
 			children = (
@@ -125,9 +134,10 @@
 		EA203AF0183133F4000B08C3 /* qicheng */ = {
 			isa = PBXGroup;
 			children = (
-				EA6E4C7F1837DBDA00202A38 /* Resource */,
 				EA6E4C701837A71F00202A38 /* AsyncSocket */,
+				EA1C6CCA183A738200F9C4D8 /* Config */,
 				EA203B1918313541000B08C3 /* Login */,
+				EA6E4C7F1837DBDA00202A38 /* Resource */,
 				EA203AFA183133F4000B08C3 /* AppDelegate.m */,
 				EA203AF9183133F4000B08C3 /* AppDelegate.h */,
 				EA203AFC183133F4000B08C3 /* Images.xcassets */,
