@@ -111,7 +111,7 @@
             //NSMutableData* allData = [NSMutableData dataWithLength:totalLength];
             //[allData appendData:data];
 
-            [AppDelegate shareAppDelegate].readData = [NSMutableData initWithLength:totalLength];
+            [AppDelegate shareAppDelegate].readData = [[NSMutableData initWithLength:totalLength] autorelease];
             [[AppDelegate shareAppDelegate].readData appendData:data];
             [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
             // NSData *szData = [size dataUsingEncoding:NSASCIIStringEncoding];
@@ -132,6 +132,8 @@
             
         }
     }
+    //it should not come here
+    assert(false);
     if ( bWait2Read )
     {
         [_socket readDataWithTimeout:-1 tag:0];
