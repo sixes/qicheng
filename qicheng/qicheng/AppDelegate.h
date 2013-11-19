@@ -31,7 +31,23 @@
 @property (strong, nonatomic) UIWindow *window;
 
 + (AppDelegate*) shareAppDelegate;
+
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;
+
+
+- (void)queryAlarmIsOpen;
+- (void)queryAllAlarmCount;
+- (void)queryAllRelayStatus;
+- (void)queryAllSensorStatus;
+- (void)queryAllTimerStatus;
+- (void)querySysDateTime;
+
+
+- (void)prepareSendData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag;
+- (void)sendDataWithFunctionName:(NSString *)name data:(NSData *)aData;
+
+
 - (void)didReceiveData:(NSMutableData *)data;
 - (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData;
+
 @end
