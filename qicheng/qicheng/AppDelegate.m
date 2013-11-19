@@ -11,8 +11,10 @@
 
 @implementation AppDelegate
 
-@synthesize width   = _width;
 @synthesize height  = _height;
+@synthesize readData= _readData;
+@synthesize width   = _width;
+
 
 +(AppDelegate*) shareAppDelegate
 {
@@ -71,6 +73,19 @@
    // [_socket readDataWithTimeout:-1 tag:0];
 }
 
+- (void)didReceiveData:(NSMutableData *)data
+{
+    NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
+    
+    NSLog(@"%s %d,receive msg = %@",__FUNCTION__,__LINE__,msg);
+}
+
+- (void)onSocket:(AsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+{
+    NSLog(@"__FUNCTION__:%s,__LINE__:%d",__FUNCTION__,__LINE__);
+    [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+}
+
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
@@ -78,34 +93,46 @@
     NSLog(@"%s %d,msg = %@",__FUNCTION__,__LINE__,msg);
     
 
-    if ( NSOrderedSame == [ msg compare:@"!" options:NSLiteralSearch range:NSMakeRange(0,1)])
+    BOOL bWait2Read = YES;
+    if ( NSOrderedSame == [msg compare:@"!" options:NSLiteralSearch range:NSMakeRange(0,1)])
     {
-      //  if ( NSOrderedSame == [[CLoginInfo shareLoginInfo].loginModuleIdx compare:msg options:NSCaseInsensitiveSearch range:NSMakeRange(1, 2)])
-        if ( NSOrderedSame == [ msg compare:[CLoginInfo shareLoginInfo].loginModuleIdx options:NSNumericSearch range:NSMakeRange(1, 2)])
+        if ( NSOrderedSame == [msg compare:[CLoginInfo shareLoginInfo].loginModuleIdx options:NSNumericSearch range:NSMakeRange(1, 2)])
         {
+            bWait2Read = NO;
             NSString *size = [msg substringWithRange:NSMakeRange(3, 2)];
-            NSLog(@"data size:%d",[size intValue]);
             
             
-            NSData *szData = [size dataUsingEncoding:NSASCIIStringEncoding];
-            Byte * szBytes = (Byte *)[szData bytes];
-            int total = 0;
-            for (int i = 0; i != [szData length]; ++i)
-            {
-                switch ( szBytes[i] )
-                {
-                    case 'f':
-                        total += 15 * pow(16.0, [szData length] - i - 1);
-                        break;
+            NSUInteger dataLength = strtoul([size UTF8String],0,16);
+            NSLog(@"data size:%d",dataLength);
+
+            NSUInteger totalLength = dataLength + 3 + 2 + 1;
+            NSUInteger leftLength = totalLength - [data length];
+
+            //NSMutableData* allData = [NSMutableData dataWithLength:totalLength];
+            //[allData appendData:data];
+
+            [AppDelegate shareAppDelegate].readData = [NSMutableData initWithLength:totalLength];
+            [[AppDelegate shareAppDelegate].readData appendData:data];
+            [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
+            // NSData *szData = [size dataUsingEncoding:NSASCIIStringEncoding];
+            // Byte * szBytes = (Byte *)[szData bytes];
+            // int total = 0;
+            // for (int i = 0; i != [szData length]; ++i)
+            // {
+            //     switch ( szBytes[i] )
+            //     {
+            //         case 'f':
+            //             total += 15 * pow(16.0, [szData length] - i - 1);
+            //             break;
                         
-                    default:
-                        break;
-                }
-            }
+            //         default:
+            //             break;
+            //     }
+            // }
             
         }
     }
-    else
+    if ( bWait2Read )
     {
         [_socket readDataWithTimeout:-1 tag:0];
     }

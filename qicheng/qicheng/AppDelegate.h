@@ -19,14 +19,18 @@
     AsyncSocket *_socket;
     BOOL _bConnected;
     NSTimer * _timer;
-    
+    NSMutableData *_readData;
     CGFloat _width;
     CGFloat _height;
 }
 
-@property (assign) CGFloat width;
 @property (assign) CGFloat height;
+@property (assign) CGFloat width;
+@property (assign,retain) NSMutableData *readData;
+
 @property (strong, nonatomic) UIWindow *window;
-+(AppDelegate*) shareAppDelegate;
--(BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;
+
++ (AppDelegate*) shareAppDelegate;
+- (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;
+- (void)didReceiveData:(NSMutableData *)data;
 @end
