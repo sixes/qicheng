@@ -22,8 +22,20 @@ static CLoginInfo * _shareLoginInfo;
 {
     if ( ! _shareLoginInfo )
     {
-        _shareLoginInfo = [[CLoginInfo alloc] init];
+        _shareLoginInfo = [[CLoginInfo alloc] initWithModuleIdx:@"01" password:@"1234"];
+        
     }
     return _shareLoginInfo;
+}
+
+- (id)initWithModuleIdx:(NSString *)idx password:(NSString *)psw
+{
+    if ( self = [super init] )
+    {
+        _strModuleIdx   = idx;
+        _strPassword    = psw;
+    }
+    return self
+    ;
 }
 @end

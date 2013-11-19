@@ -155,7 +155,7 @@
    // _textFieldIp.text
     
     //it should save at the time login successes,not here...to be done
-    [[CLoginInfo shareLoginInfo] setLoginPasswod:_textFieldPassword.text];
+    [[CLoginInfo shareLoginInfo] setLoginPasswod:@"1234"];
     [[CLoginInfo shareLoginInfo] setLoginModuleIdx:@"01"];
     NSLog(@"psw:%@",[CLoginInfo shareLoginInfo].loginPasswod);
     [[AppDelegate shareAppDelegate] onTapLogin:_textFieldIp.text  psw:_textFieldPassword.text];

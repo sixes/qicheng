@@ -23,6 +23,6 @@
 @property (nonatomic,copy) NSString *loginPasswod;
 @property (nonatomic,copy) NSString *loginPort;
 
-+(CLoginInfo *)shareLoginInfo;
-
++ (CLoginInfo *)shareLoginInfo;
+- (id)initWithModuleIdx:(NSString *)idx password:(NSString *)psw;
 @end

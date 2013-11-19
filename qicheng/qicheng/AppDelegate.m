@@ -44,8 +44,8 @@
     }
    //
    // [_socket writeData:[@"$011234s#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
-    [_socket writeData:[@"$011234a00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
-    [_socket writeData:[@"$011234b00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+   // [_socket writeData:[@"$011234a00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+   // [_socket writeData:[@"$011234b00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
     return YES;
 }
 
@@ -57,16 +57,15 @@
 
 - (void)onSocket:(AsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
-    NSLog(@"%s %d",__FUNCTION__,__LINE__);
-    NSLog(@"connected!!!");
+    NSLog(@"%s L:%d connected!!!",__FUNCTION__,__LINE__);
     [_socket readDataWithTimeout:-1 tag:0];
     
-    [NSTimer scheduledTimerWithTimeInterval:0.0 target:self selector:@selector(querySysDateTime) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(queryAllRelayStatus) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:0.4 target:self selector:@selector(queryAllTimerStatus) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:2.2 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:3.4 target:self selector:@selector(querySysDateTime) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:4.6 target:self selector:@selector(queryAllRelayStatus) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:5.8 target:self selector:@selector(queryAllTimerStatus) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:6.0 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
 };
 
 - (void)onSocket:(AsyncSocket *)sock didWriteDataWithTag:(long)tag
@@ -77,19 +76,19 @@
 
 - (void)didReceiveData:(NSMutableData *)data
 {
-    NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
-    
-    NSLog(@"%s %d,receive data: %@",__FUNCTION__,__LINE__,msg);
+    NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
     
     NSUInteger functionNameIdx = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + LENGTH_DATA_LENGTH;
     NSString *functionName = [msg substringWithRange:NSMakeRange(functionNameIdx, LENGTH_FUNCTION_NAME)];
     NSString *realData = [msg substringWithRange:NSMakeRange(functionNameIdx + 1, [msg length] - functionNameIdx - 1 - [RPOTOCOL_TAIL length])];
+    
+    [msg release];
     [self didReceiveDataWithFunctionName:functionName data:realData];
 }
 
-- (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData
+- (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)msg
 {
-    NSLog(@"f:%s,l:%d,functionName:%@,data:%@",__FUNCTION__,__LINE__,name,aData);
+    NSLog(@"f:%s,L:%d,functionName:%@,data:%@",__FUNCTION__,__LINE__,name,msg);
     
     if ( [name length] < 1 )
     {
@@ -100,19 +99,17 @@
     const char * fName = [name UTF8String];
     switch ( fName[0] )
     {
-        case FUNCTION_NAME_INCORRECT_INSTRUCTION:
+        case FUNCTION_INDEX_INCORRECT_INSTRUCTION:
             assert(false);
             break;
-        case FUNCTION_NAME_INCORRECT_PASSWORD:
+        case FUNCTION_INDEX_INCORRECT_PASSWORD:
             assert(false);
             break;
-        case FUNCTION_NAME_QUERY_SYS_DATETIME:
+        case FUNCTION_INDEX_QUERY_SYS_DATETIME:
             {
                 //0d0a10 0a1703 03
-                if ( LENGTH_QUERY_SYS_DATETIME == [aData length] )
+                if ( LENGTH_QUERY_SYS_DATETIME == [msg length] )
                 {
-                    NSString *msg = [[NSString alloc] initWithData:aData encoding:NSASCIIStringEncoding];                    
-
                     NSUInteger year     = strtoul([[msg substringWithRange:NSMakeRange(0,2)] UTF8String],0,16);
                     NSUInteger month    = strtoul([[msg substringWithRange:NSMakeRange(2,2)] UTF8String],0,16);
                     NSUInteger day      = strtoul([[msg substringWithRange:NSMakeRange(4,2)] UTF8String],0,16);
@@ -121,8 +118,7 @@
                     NSUInteger min      = strtoul([[msg substringWithRange:NSMakeRange(8,2)] UTF8String],0,16);
                     NSUInteger sec      = strtoul([[msg substringWithRange:NSMakeRange(10,2)] UTF8String],0,16);
                     //最后两位表示星期几,忽略
-                    [msg release];
-
+               
                     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                     [dateFormatter setDateFormat: @"yy-MM-dd HH:mm:ss"]; 
 
@@ -138,12 +134,12 @@
                 }
             }
             break;
-        case FUNCTION_NAME_QUERY_ALL_RELAY_STATUS:
+        case FUNCTION_INDEX_QUERY_ALL_RELAY_STATUS:
             {
                 //01
-                if ( LENGTH_QUERY_ALL_RELAY_STATUS == [aData length] )
+                if ( LENGTH_QUERY_ALL_RELAY_STATUS == [msg length] )
                 {
-                    NSString *msg = [[NSString alloc] initWithData:aData encoding:NSASCIIStringEncoding]; 
+                
                     NSUInteger data = strtoul([[msg substringWithRange:NSMakeRange(0,LENGTH_QUERY_ALL_RELAY_STATUS)] UTF8String],0,16);
                     NSUInteger relay7status = data & ( 1 << 8 );
                     NSUInteger relay6status = data & ( 1 << 7 );
@@ -154,7 +150,7 @@
                     NSUInteger relay1status = data & ( 1 << 2 );
                     NSUInteger relay0status = data & ( 1 );
 
-                    [msg release];
+                
                 }
                 else
                 {
@@ -162,19 +158,18 @@
                 }
             }
             break;
-        case FUNCTION_NAME_QUERY_ALL_ALARM_COUNT:
+        case FUNCTION_INDEX_QUERY_ALL_ALARM_COUNT:
             {
                 //0000ffff0000ffff
-                if ( LENGTH_QUERY_ALL_ALARM_COUNT == [aData length] )
+                if ( LENGTH_QUERY_ALL_ALARM_COUNT == [msg length] )
                 {
-                    NSString *msg = [[NSString alloc] initWithData:aData encoding:NSASCIIStringEncoding]; 
                     
                     NSUInteger alarm0count = strtoul([[msg substringWithRange:NSMakeRange(0,4)] UTF8String],0,16);   
                     NSUInteger alarm1count = strtoul([[msg substringWithRange:NSMakeRange(4,4)] UTF8String],0,16);
                     NSUInteger alarm2count = strtoul([[msg substringWithRange:NSMakeRange(8,4)] UTF8String],0,16);
                     NSUInteger alarm3count = strtoul([[msg substringWithRange:NSMakeRange(12,4)] UTF8String],0,16);
 
-                    [msg release];
+                
                 }
                 else
                 {
@@ -182,11 +177,10 @@
                 }
             }
             break;
-        case FUNCTION_NAME_QUERY_ALARM_IS_OPEN:
+        case FUNCTION_INDEX_QUERY_ALARM_IS_OPEN:
             {
-                if ( LENGTH_QUERY_ALARM_IS_OPEN == [aData length] )
+                if ( LENGTH_QUERY_ALARM_IS_OPEN == [msg length] )
                 {
-                     NSString *msg = [[NSString alloc] initWithData:aData encoding:NSASCIIStringEncoding]; 
                     
                     NSUInteger value = strtoul([[msg substringWithRange:NSMakeRange(0,LENGTH_QUERY_ALARM_IS_OPEN)] UTF8String],0,16);   
                     if ( value > 0 )
@@ -197,7 +191,7 @@
                     {
                         NSLog(@"alarm is closed"); 
                     }
-                    [msg release];
+                
                 }
                 else
                 {
@@ -205,17 +199,16 @@
                 }                
             }
             break;   
-        case FUNCTION_NAME_QUERY_ALL_TIMER_STATUS:
+        case FUNCTION_INDEX_QUERY_ALL_TIMER_STATUS:
             {
                 //assert(false);
                 NSLog(@"need to impl FUNCTION_NAME_QUERY_ALL_TIMER_STATUS");
             }   
             break; 
-        case FUNCTION_NAME_QUERY_ALL_SENSOR_STATUS:
+        case FUNCTION_INDEX_QUERY_ALL_SENSOR_STATUS:
             {
-                if ( LENGTH_QUERY_ALL_SENSOR_STATUS == [aData length] )
+                if ( LENGTH_QUERY_ALL_SENSOR_STATUS == [msg length] )
                 {
-                     NSString *msg = [[NSString alloc] initWithData:aData encoding:NSASCIIStringEncoding]; 
                     
                     NSUInteger value = strtoul([[msg substringWithRange:NSMakeRange(0,LENGTH_QUERY_ALL_SENSOR_STATUS)] UTF8String],0,16);   
                     NSUInteger sensor0status = value & ( 1 );
@@ -237,45 +230,31 @@
 
 - (void)onSocket:(AsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
 {
-    NSLog(@"__FUNCTION__:%s,__LINE__:%d",__FUNCTION__,__LINE__);
-    [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+    //NSLog(@"__FUNCTION__:%s,__LINE__:%d",__FUNCTION__,__LINE__);
 }
 
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
     
-    NSLog(@"%s %d,msg = %@",__FUNCTION__,__LINE__,msg);
-    
-    NSString *msgDelegate = [[NSString alloc] initWithData:[AppDelegate shareAppDelegate].readData encoding:NSASCIIStringEncoding];
-    NSLog(@"delegateData:%@",msgDelegate);
-
-    BOOL bWait2Read = YES;
-    if ( NSOrderedSame == [msg compare:@"!" options:NSLiteralSearch range:NSMakeRange(0,1)])
+    if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0,[PROTOCOL_RECV_HEAD length])])
     {
         if ( NSOrderedSame == [msg compare:[CLoginInfo shareLoginInfo].loginModuleIdx options:NSNumericSearch range:NSMakeRange(1, 2)])
         {
-            bWait2Read = NO;
+            if ( [msg length] < 5 )
+            {
+                assert(false);
+            }
             NSString *size = [msg substringWithRange:NSMakeRange(3, 2)];
-            
-            
             NSUInteger dataLength = strtoul([size UTF8String],0,16);
-            NSLog(@"data size:%d",dataLength);
-
             NSUInteger totalLength = dataLength + 3 + 2 + 1;
             NSUInteger leftLength = totalLength - [data length];
-
             
             [AppDelegate shareAppDelegate].readData = [[[NSMutableData alloc]initWithCapacity:totalLength] autorelease];
             [[AppDelegate shareAppDelegate].readData appendData:data];
             
             if ( leftLength > 0 )
             {
-                
-                NSString *readData = [[NSString alloc] initWithData:[AppDelegate shareAppDelegate].readData encoding:NSASCIIStringEncoding];
-                NSLog(@"data is .....%@",readData);
-                
-                
                 [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
             }
             else
@@ -289,7 +268,7 @@
             
         }
     }
-    else if ( NSOrderedSame == [msg compare:@"#" options:NSLiteralSearch range:NSMakeRange([data length] - 1, 1)] )
+    else if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_TAIL options:NSLiteralSearch range:NSMakeRange([data length] - 1, [PROTOCOL_RECV_TAIL length])] )
     {
         //读完数据了
         [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
@@ -315,38 +294,32 @@
 
 - (void)queryAllSensorStatus
 {
-    NSString *name = [NSString stringWithCString:FUNCTION_NAME_QUERY_ALL_SENSOR_STATUS encoding:NSASCIIStringEncoding];
-    [self sendDataWithFunctionName:name data:nil];
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALL_SENSOR_STATUS data:nil];
 }
 
 - (void)queryAllTimerStatus
 {
-    NSString *name = [NSString stringWithCString:FUNCTION_NAME_QUERY_ALL_TIMER_STATUS encoding:NSASCIIStringEncoding];
-    [self sendDataWithFunctionName:name data:nil];
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALL_TIMER_STATUS data:nil];
 }
 
 - (void)queryAlarmIsOpen
 {
-    NSString *name = [NSString stringWithCString:FUNCTION_NAME_QUERY_ALARM_IS_OPEN encoding:NSASCIIStringEncoding];
-    [self sendDataWithFunctionName:name data:nil];
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALARM_IS_OPEN data:nil];
 }
 
 - (void)querySysDateTime
 {
-    NSString *name = [NSString stringWithCString:FUNCTION_NAME_QUERY_SYS_DATETIME encoding:NSASCIIStringEncoding];
-    [self sendDataWithFunctionName:name data:nil];
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_SYS_DATETIME data:nil];
 }
 
 - (void)queryAllRelayStatus
 {
-    NSString *name = [NSString stringWithCString:FUNCTION_NAME_QUERY_ALL_RELAY_STATUS encoding:NSASCIIStringEncoding];
-    [self sendDataWithFunctionName:name data:nil];
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALL_RELAY_STATUS data:nil];
 }
 
 - (void)queryAllAlarmCount
 {
-    NSString *name = [NSString stringWithCString:FUNCTION_NAME_QUERY_ALL_ALARM_COUNT encoding:NSASCIIStringEncoding];
-    [self sendDataWithFunctionName:name data:nil];
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALL_ALARM_COUNT data:nil];
 }
 
 - (void)sendDataWithFunctionName:(NSString *)name data:(NSData *)aData
@@ -356,24 +329,28 @@
         assert(false);
         return;
     }
-    NSUInteger dataLength = [aData length];
-    NSUInteger totalLength = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + [[CLoginInfo shareLoginInfo].loginPasswod length]
-                            + LENGTH_FUNCTION_NAME + dataLength;
+    
+    NSUInteger dataLength   = [aData length];
+    NSUInteger totalLength  = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + [[CLoginInfo shareLoginInfo].loginPasswod length]
+                            + LENGTH_FUNCTION_NAME + dataLength + [RPOTOCOL_TAIL length];
     NSMutableData *prepareData = [NSMutableData dataWithCapacity:totalLength];
-    [prepareData appendData:PROTOCOL_HEAD];
-    [prepareData appendData:[CLoginInfo shareLoginInfo].loginModuleIdx];
-    [prepareData appendData:[CLoginInfo shareLoginInfo].loginPasswod];
-    [prepareData appendData:name];
+    [prepareData appendData:[PROTOCOL_HEAD dataUsingEncoding:NSASCIIStringEncoding]];
+    [prepareData appendData:[[CLoginInfo shareLoginInfo].loginModuleIdx dataUsingEncoding:NSASCIIStringEncoding]];
+    [prepareData appendData:[[CLoginInfo shareLoginInfo].loginPasswod dataUsingEncoding:NSASCIIStringEncoding]];
+    [prepareData appendData:[name dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:aData];
-    [prepareData appendData:RPOTOCOL_TAIL];
-    [self prepareSendData:[prepareData dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
+    [prepareData appendData:[RPOTOCOL_TAIL dataUsingEncoding:NSASCIIStringEncoding]];
+    [self prepareSendData:prepareData withTimeout:10 tag:0];
 }
 
 - (void)prepareSendData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag
 {
     //这里可以加密...to be done
-    NSLog(@"%@,line:%d,data:%@",__FUNCTION__,__LINE__,[data dataUsingEncoding:NSASCIIStringEncoding]);
+    //NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+    //NSLog(@"%s,line:%d,data:%@",__FUNCTION__,__LINE__,msg);
+    //[_socket writeData:[@"$011234s#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:timeout tag:tag];
     [_socket writeData:data withTimeout:timeout tag:tag];
+    //[msg release];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
