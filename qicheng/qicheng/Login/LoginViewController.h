@@ -19,4 +19,6 @@
     
     UIImageView *_bg;
 }
+
+- (void)didLoginSuccess;
 @end

@@ -11,11 +11,11 @@
 #import "AsyncSocket/AsyncUdpSocket.h"
 #import "AsyncSocket/AsyncSocket.h"
 #import "LoginViewController.h"
-
+#import "MainUIViewController.h"
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
     LoginViewController *_loginViewController;
-    
+    MainUIViewController *_mainUIViewController;
     AsyncSocket *_socket;
     BOOL _bConnected;
     NSTimer * _timer;
@@ -27,9 +27,11 @@
 @property (assign) CGFloat height;
 @property (assign) CGFloat width;
 @property (nonatomic,retain) NSMutableData *readData;
-
+@property (nonatomic,assign) LoginViewController *loginViewController;
+@property (nonatomic,assign) MainUIViewController *mainUIViewController;
 @property (strong, nonatomic) UIWindow *window;
 
+- (void)didLoginSuccess;
 + (AppDelegate*) shareAppDelegate;
 
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;

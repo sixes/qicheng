@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "CLoginInfo.h"
 #import "LoginViewController.h"
+#import "MainUIViewController.h"
 
 @interface LoginViewController ()
 
@@ -65,20 +66,28 @@
     [_textFieldPassword resignFirstResponder];
 }
 
-- (void)viewDidLoad
+- (void)loadView
 {
-    [super viewDidLoad];
-	// Do any additional setup after loading the view.
+    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
+    UIImageView *imgView =  [[UIImageView alloc] initWithImage:imgBg];
+    [imgView setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
+    
+    //self.view CAN NOT use UIImageView as a root view,or it CAN NOT be touched,wonder why...
+    self.view = [[UIView alloc] initWithFrame:[[UIScreen  mainScreen] applicationFrame]];
+    [self.view addSubview:imgView];
+    
+    [imgView release];
+  //  self.view = [[UIView alloc] init];
     
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTapOutside)];
     [self.view addGestureRecognizer:tgr];
     [tgr release];
     
     
-    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
-    [_bg setImage:imgBg];
-    [_bg setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
-    [self.view addSubview:_bg];
+//    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
+//    [_bg setImage:imgBg];
+//    [_bg setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
+//    [self.view addSubview:_bg];
     
     NSString *pStr = @"地址 ";
     CGSize ipStrSize = [pStr sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
@@ -140,6 +149,24 @@
     [_btnLogin setBackgroundColor:[UIColor lightGrayColor]];
     [_btnLogin addTarget:self action:@selector(onBtnLogin:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_btnLogin];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	// Do any additional setup after loading the view.
+    
+    
+}
+
+
+- (void)didLoginSuccess
+{
+    if ( ! [AppDelegate shareAppDelegate].mainUIViewController )
+    {
+        [AppDelegate shareAppDelegate].mainUIViewController = [[MainUIViewController alloc] init];
+    }
+    [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
 }
 
 - (void)onPassWordDone:(id)sender

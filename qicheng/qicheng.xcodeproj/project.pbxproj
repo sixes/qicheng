@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EA193A25183CF6660027280E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = EA193A23183CF6660027280E /* Default.png */; };
+		EA193A2C183D14B30027280E /* MainUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA193A2B183D14B30027280E /* MainUIViewController.m */; };
+		EA193A32183D20C80027280E /* bg4.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = EA193A31183D20C80027280E /* bg4.jpeg */; };
 		EA1EC31D1838B60F00F46176 /* CLoginInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1EC31C1838B60F00F46176 /* CLoginInfo.m */; };
 		EA1EC3231838FA5300F46176 /* bg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1EC3221838FA5300F46176 /* bg3.jpg */; };
 		EA203AEB183133F4000B08C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEA183133F4000B08C3 /* Foundation.framework */; };
@@ -38,6 +41,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA193A23183CF6660027280E /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resource/Default.png; sourceTree = "<group>"; };
+		EA193A2A183D14B30027280E /* MainUIViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainUIViewController.h; path = MainUI/MainUIViewController.h; sourceTree = "<group>"; };
+		EA193A2B183D14B30027280E /* MainUIViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MainUIViewController.m; path = MainUI/MainUIViewController.m; sourceTree = "<group>"; };
+		EA193A31183D20C80027280E /* bg4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg4.jpeg; path = Resource/bg4.jpeg; sourceTree = "<group>"; };
 		EA1C6CCB183A73C200F9C4D8 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		EA1EC31B1838B60F00F46176 /* CLoginInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CLoginInfo.h; path = Login/CLoginInfo.h; sourceTree = "<group>"; };
 		EA1EC31C1838B60F00F46176 /* CLoginInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CLoginInfo.m; path = Login/CLoginInfo.m; sourceTree = "<group>"; };
@@ -92,6 +99,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		EA193A27183D137C0027280E /* Data */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		EA193A29183D13EF0027280E /* MainUI */ = {
+			isa = PBXGroup;
+			children = (
+				EA193A2A183D14B30027280E /* MainUIViewController.h */,
+				EA193A2B183D14B30027280E /* MainUIViewController.m */,
+			);
+			name = MainUI;
+			sourceTree = "<group>";
+		};
 		EA1C6CCA183A738200F9C4D8 /* Config */ = {
 			isa = PBXGroup;
 			children = (
@@ -136,7 +159,9 @@
 			children = (
 				EA6E4C701837A71F00202A38 /* AsyncSocket */,
 				EA1C6CCA183A738200F9C4D8 /* Config */,
+				EA193A27183D137C0027280E /* Data */,
 				EA203B1918313541000B08C3 /* Login */,
+				EA193A29183D13EF0027280E /* MainUI */,
 				EA6E4C7F1837DBDA00202A38 /* Resource */,
 				EA203AFA183133F4000B08C3 /* AppDelegate.m */,
 				EA203AF9183133F4000B08C3 /* AppDelegate.h */,
@@ -200,6 +225,8 @@
 		EA6E4C7F1837DBDA00202A38 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				EA193A31183D20C80027280E /* bg4.jpeg */,
+				EA193A23183CF6660027280E /* Default.png */,
 				EA1EC3221838FA5300F46176 /* bg3.jpg */,
 			);
 			name = Resource;
@@ -280,9 +307,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA193A32183D20C80027280E /* bg4.jpeg in Resources */,
 				EA1EC3231838FA5300F46176 /* bg3.jpg in Resources */,
 				EA203AF5183133F4000B08C3 /* InfoPlist.strings in Resources */,
 				EA203AFD183133F4000B08C3 /* Images.xcassets in Resources */,
+				EA193A25183CF6660027280E /* Default.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA193A2C183D14B30027280E /* MainUIViewController.m in Sources */,
 				EA203AFB183133F4000B08C3 /* AppDelegate.m in Sources */,
 				EA6E4C7C1837A7AF00202A38 /* AsyncUdpSocket.m in Sources */,
 				EA203AF7183133F4000B08C3 /* main.m in Sources */,

@@ -9,14 +9,15 @@
 #import "AppDelegate.h"
 #import "CLoginInfo.h"
 #import "Config.h"
+#import "MainUIViewController.h"
 
 @implementation AppDelegate
 
 @synthesize height  = _height;
 @synthesize readData= _readData;
 @synthesize width   = _width;
-
-
+@synthesize loginViewController = _loginViewController;
+@synthesize mainUIViewController = _mainUIViewController;
 +(AppDelegate*) shareAppDelegate
 {
     return [[UIApplication sharedApplication] delegate];
@@ -55,11 +56,22 @@
     
 }
 
+- (void)didLoginSuccess
+{
+    if ( ! _mainUIViewController )
+    {
+        _mainUIViewController = [[MainUIViewController alloc] init];
+    }
+    //[self presentModalViewController:_mainUIViewController animate:YES];
+}
+
 - (void)onSocket:(AsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
     NSLog(@"%s L:%d connected!!!",__FUNCTION__,__LINE__);
     [_socket readDataWithTimeout:-1 tag:0];
     
+    //[[AppDelegate shareAppDelegate] didLoginSuccess];
+    [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
     [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:2.2 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:3.4 target:self selector:@selector(querySysDateTime) userInfo:nil repeats:NO];
