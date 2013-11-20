@@ -235,8 +235,39 @@
 
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    NSString *msg = [[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding] autorelease];
-    
+    NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+    BOOL bNextFrame = NO;
+    BOOL bFrameStart = NO;
+    if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0,[PROTOCOL_RECV_HEAD length])] )
+    {
+        bFrameStart = YES;
+        if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_TAIL options:NSLiteralSearch range:NSMakeRange([data length] - [PROTOCOL_RECV_TAIL length], [PROTOCOL_RECV_TAIL length])] )
+        {
+            bNextFrame = YES; 
+            //读完数据了
+            [[AppDelegate shareAppDelegate] didReceiveData:data];
+        }
+    }
+
+    if ( NO == bNextFrame )
+    {
+         if ( YES == bFrameStart )
+        {
+            [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc]initWithCapacity:[msg length] * 2];
+        }   
+        [[AppDelegate shareAppDelegate].readData appendData:data];
+        if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_TAIL options:NSLiteralSearch range:NSMakeRange([data length] - [PROTOCOL_RECV_TAIL length], [PROTOCOL_RECV_TAIL length])] )
+        {
+             //读完数据了
+            [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+            [[AppDelegate shareAppDelegate].readData release];
+        }    
+    }
+    [msg release];
+    //waiting for next package
+    [_socket readDataWithTimeout:-1 tag:0];
+    return ;
+
     if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0,[PROTOCOL_RECV_HEAD length])])
     {
         if ( NSOrderedSame == [msg compare:[CLoginInfo shareLoginInfo].loginModuleIdx options:NSNumericSearch range:NSMakeRange(1, 2)])
@@ -244,28 +275,32 @@
             if ( [msg length] < 5 )
             {
                 assert(false);
-            }
-            NSString *size = [msg substringWithRange:NSMakeRange(3, 2)];
-            NSUInteger dataLength = strtoul([size UTF8String],0,16);
-            NSUInteger totalLength = dataLength + 3 + 2 + 1;
-            NSUInteger leftLength = totalLength - [data length];
-            
-            [AppDelegate shareAppDelegate].readData = [[[NSMutableData alloc]initWithCapacity:totalLength] autorelease];
-            [[AppDelegate shareAppDelegate].readData appendData:data];
-            
-            if ( leftLength > 0 )
-            {
-                [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
+                //[AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+                //[[AppDelegate shareAppDelegate].readData appendData:data];
             }
             else
             {
-                //读完数据了
-                [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+                NSString *size = [msg substringWithRange:NSMakeRange(3, 2)];
+                NSUInteger dataLength = strtoul([size UTF8String],0,16);
+                NSUInteger totalLength = dataLength + 3 + 2 + 1;
+                NSUInteger leftLength = totalLength - [data length];
                 
-                //waiting for next package
-                [_socket readDataWithTimeout:-1 tag:0];
+                [AppDelegate shareAppDelegate].readData = [[[NSMutableData alloc]initWithCapacity:totalLength] autorelease];
+                [[AppDelegate shareAppDelegate].readData appendData:data];
+                
+                if ( leftLength > 0 )
+                {
+                    [_socket readDataToLength:leftLength withTimeout:-1 buffer:[AppDelegate shareAppDelegate].readData bufferOffset:[data length] tag:0];
+                }
+                else
+                {
+                    //读完数据了
+                    [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+                    
+                    //waiting for next package
+                    [_socket readDataWithTimeout:-1 tag:0];
+                }
             }
-            
         }
     }
     else if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_TAIL options:NSLiteralSearch range:NSMakeRange([data length] - 1, [PROTOCOL_RECV_TAIL length])] )
