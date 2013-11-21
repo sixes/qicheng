@@ -91,7 +91,15 @@
     NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
     
     NSUInteger functionNameIdx = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + LENGTH_DATA_LENGTH;
+    if ( functionNameIdx >= [msg length] )
+    {
+        assert(false);
+    }
     NSString *functionName = [msg substringWithRange:NSMakeRange(functionNameIdx, LENGTH_FUNCTION_NAME)];
+    if ( functionNameIdx + 1 >= [msg length] )
+    {
+        assert(false);
+    }
     NSString *realData = [msg substringWithRange:NSMakeRange(functionNameIdx + 1, [msg length] - functionNameIdx - 1 - [RPOTOCOL_TAIL length])];
     
     [msg release];
@@ -248,6 +256,121 @@
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+    
+    
+    //1. 完整的一帧 2、完整的多帧 3、几个帆加片断
+    
+    
+    if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0, [PROTOCOL_RECV_HEAD length])] )
+    {
+        NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
+        NSRange rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
+        NSUInteger idx = 0;
+        for ( ; NSNotFound != rret.location; )
+        {
+            if ( 3 == idx )
+            {
+                assert(false);
+            }
+            NSData *oneFrame = [[msg substringWithRange:NSMakeRange(idx, rret.location + 1 - idx)] dataUsingEncoding:NSASCIIStringEncoding];
+            [[AppDelegate shareAppDelegate] didReceiveData:oneFrame];
+            
+            idx += rret.location + 1;
+            
+            if ( idx < [msg length] )
+            {
+                if ( 3 == idx )
+                {
+                    assert(false);
+                }
+                rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+            }
+            else
+            {
+                break;
+            }
+        }
+        if ( idx < [msg length] )
+        {
+            if ( 3 == idx )
+            {
+                assert(false);
+            }
+            rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+            [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+            NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
+            [[AppDelegate shareAppDelegate].readData appendData:leftData];
+        }
+    }
+    else
+    {
+        NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
+        NSRange rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
+        NSUInteger idx = 0;
+        if ( NSNotFound == rret.location )
+        {
+            if ( [AppDelegate shareAppDelegate].readData == nil )
+            {
+                [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+            }
+            [[AppDelegate shareAppDelegate].readData appendData:data];
+        }
+        else
+        {
+            for ( ; NSNotFound != rret.location; )
+            {
+                if ( 3 == idx )
+                {
+                    assert(false);
+                }
+                NSData *oneFrame = [[msg substringWithRange:NSMakeRange(idx, rret.location + 1 - idx)] dataUsingEncoding:NSASCIIStringEncoding];
+                if ( [AppDelegate shareAppDelegate].readData == nil )
+                {
+                    [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+                }
+                [[AppDelegate shareAppDelegate].readData appendData:oneFrame];
+                [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+                [[AppDelegate shareAppDelegate].readData release];
+                [AppDelegate shareAppDelegate].readData = nil;
+                idx += rret.location + 1;
+                
+                if ( idx < [msg length] )
+                {
+                    if ( 3 == idx )
+                    {
+                        assert(false);
+                    }
+                    rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if ( idx < [msg length] )
+            {
+                if ( 3 == idx )
+                {
+                    assert(false);
+                }
+                rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+                [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+                NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
+                [[AppDelegate shareAppDelegate].readData appendData:leftData];
+            }
+        }
+
+    }
+    
+
+    
+    //waiting for next package
+    [_socket readDataWithTimeout:-1 tag:0];
+    
+    
+    
+    return ;
+    
     BOOL bNextFrame = NO;
     BOOL bFrameStart = NO;
     if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0,[PROTOCOL_RECV_HEAD length])] )
@@ -257,7 +380,41 @@
         {
             bNextFrame = YES; 
             //读完数据了
-            [[AppDelegate shareAppDelegate] didReceiveData:data];
+            //WARNING!!! 需要判断是否接收了两帧以上的数据
+            
+            NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
+            NSRange rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
+            NSUInteger idx = 0;
+            for ( ; rret.location != NSNotFound; )
+            {
+                if ( 5 == idx )
+                {
+                    assert(false);
+                }
+                NSString *wholeFrame = [msg substringWithRange:NSMakeRange(idx, rret.location + 1)];
+                idx += rret.location + 1;
+                NSData *wholdData = [wholeFrame dataUsingEncoding:NSASCIIStringEncoding];
+                [[AppDelegate shareAppDelegate] didReceiveData:wholdData];
+                
+                if ( idx < [msg length] )
+                {
+                    rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+                }
+                else
+                {
+                    break;
+                }
+            }
+           // [[AppDelegate shareAppDelegate] didReceiveData:data];
+            if ( idx < [msg length] )
+            {
+                NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
+                if ( [AppDelegate shareAppDelegate].readData == nil )
+                {
+                    [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+                }
+                [[AppDelegate shareAppDelegate].readData appendData:leftData];
+            }
         }
     }
 
@@ -267,12 +424,50 @@
         {
             [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc]initWithCapacity:[msg length] * 2];
         }   
-        [[AppDelegate shareAppDelegate].readData appendData:data];
+        
         if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_TAIL options:NSLiteralSearch range:NSMakeRange([data length] - [PROTOCOL_RECV_TAIL length], [PROTOCOL_RECV_TAIL length])] )
         {
              //读完数据了
-            [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
-            [[AppDelegate shareAppDelegate].readData release];
+            
+            NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
+            NSRange rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
+            NSUInteger idx = 0;
+            for ( ; rret.location != NSNotFound; )
+            {
+                if ( 5 == idx )
+                {
+                    assert(false);
+                }
+                NSString *wholeFrame = [msg substringWithRange:NSMakeRange(idx, rret.location + 1)];
+                idx += rret.location + 1;
+                NSData *wholdData = [wholeFrame dataUsingEncoding:NSASCIIStringEncoding];
+                if ( [AppDelegate shareAppDelegate].readData == nil )
+                {
+                    [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+                }
+                [[AppDelegate shareAppDelegate].readData appendData:wholdData];
+                [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+                [[AppDelegate shareAppDelegate].readData release];
+                [AppDelegate shareAppDelegate].readData = nil;
+                if ( idx < [msg length] )
+                {
+                    rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx + 1, [msg length] - idx - 1)];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+            //要把剩下的数据保存起来
+            if ( idx < [msg length] )
+            {
+                NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
+                [[AppDelegate shareAppDelegate].readData appendData:leftData];
+            }
+            
+           // [[AppDelegate shareAppDelegate] didReceiveData:[AppDelegate shareAppDelegate].readData];
+           // [[AppDelegate shareAppDelegate].readData release];
         }    
     }
     [msg release];
@@ -411,7 +606,15 @@
     
     //[[_loginViewController alloc] init];
     _loginViewController = [[LoginViewController alloc] init];
-    [self.window addSubview:_loginViewController.view];
+    if ( [self.window respondsToSelector:@selector(setRootViewController:)] )
+    {
+        [self.window setRootViewController:_loginViewController];
+    }
+    else
+    {
+        [self.window addSubview:_loginViewController.view];
+    }
+    
     return YES;
 }
 

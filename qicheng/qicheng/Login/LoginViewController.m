@@ -98,7 +98,7 @@
     [_lblLoginIp setBackgroundColor:[UIColor clearColor]];
     //[self.view addSubview:_lblLoginIp];
     
-    [_textFieldIp setFrame:CGRectMake(15, [AppDelegate shareAppDelegate].height / 3, [AppDelegate shareAppDelegate].width - 15 * 2, 30)];
+    [_textFieldIp setFrame:CGRectMake(15, [AppDelegate shareAppDelegate].height / 3 - 20, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
     [_textFieldIp setTextColor:[UIColor blackColor]];
     [_textFieldIp setBackgroundColor:[UIColor whiteColor]];
     [_textFieldIp setText:@"192.168.1.254:50000"];
@@ -126,7 +126,7 @@
     
     
     
-    [_textFieldPassword setFrame:CGRectMake(15,_textFieldIp.frame.origin.y + _textFieldIp.frame.size.height + 5, [AppDelegate shareAppDelegate].width - 15 * 2, 30)];
+    [_textFieldPassword setFrame:CGRectMake(15,_textFieldIp.frame.origin.y + _textFieldIp.frame.size.height + 5, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
     [_textFieldPassword setTextColor:[UIColor blackColor]];
     [_textFieldPassword setBackgroundColor:[UIColor whiteColor]];
     //[textFieldPassword setText:@"192.168.1.92:50000"];
@@ -145,7 +145,7 @@
     
     [_btnLogin setTitle:@"登录" forState:UIControlStateNormal];
     [_btnLogin setTitleColor:[UIColor whiteColor] forState:UIControlContentHorizontalAlignmentCenter];
-    [_btnLogin setFrame:CGRectMake(15,_textFieldPassword.frame.origin.y + _textFieldPassword.frame.size.height + 10, [AppDelegate shareAppDelegate].width - 15 * 2, 35)];
+    [_btnLogin setFrame:CGRectMake(15,_textFieldPassword.frame.origin.y + _textFieldPassword.frame.size.height + 10, [AppDelegate shareAppDelegate].width - 15 * 2, 45)];
     [_btnLogin setBackgroundColor:[UIColor lightGrayColor]];
     [_btnLogin addTarget:self action:@selector(onBtnLogin:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_btnLogin];
