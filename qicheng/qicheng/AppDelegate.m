@@ -573,15 +573,15 @@
     }
     
     NSUInteger dataLength   = [aData length];
-    NSUInteger totalLength  = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + [[CLoginInfo shareLoginInfo].loginPasswod length]
-                            + LENGTH_FUNCTION_NAME + dataLength + [RPOTOCOL_TAIL length];
+    NSUInteger totalLength  = [PROTOCOL_SEND_HEAD length] + LENGTH_MODULE_ADDR + [[CLoginInfo shareLoginInfo].loginPasswod length]
+                            + LENGTH_FUNCTION_NAME + dataLength + [RPOTOCOL_SEND_TAIL length];
     NSMutableData *prepareData = [NSMutableData dataWithCapacity:totalLength];
-    [prepareData appendData:[PROTOCOL_HEAD dataUsingEncoding:NSASCIIStringEncoding]];
+    [prepareData appendData:[PROTOCOL_SEND_HEAD dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:[[CLoginInfo shareLoginInfo].loginModuleIdx dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:[[CLoginInfo shareLoginInfo].loginPasswod dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:[name dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:aData];
-    [prepareData appendData:[RPOTOCOL_TAIL dataUsingEncoding:NSASCIIStringEncoding]];
+    [prepareData appendData:[RPOTOCOL_SEND_TAIL dataUsingEncoding:NSASCIIStringEncoding]];
     [self prepareSendData:prepareData withTimeout:10 tag:0];
 }
 
