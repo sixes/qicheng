@@ -68,11 +68,10 @@
 
 - (void)loadView
 {
-    //UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
+    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
     //UIImageView *imgView =  [[UIImageView alloc] initWithImage:imgBg];
     //[imgView setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
     
-    //self.view CAN NOT use UIImageView as a root view,or it CAN NOT be touched,wonder why...
     self.view = [[UIImageView alloc] initWithImage:imgBg];
     [self.view setFrame::CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
     self.view.userInteractionEnabled = YES;

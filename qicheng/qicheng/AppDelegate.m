@@ -257,22 +257,14 @@
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-    
-    
+
     //1. 完整的一帧 2、完整的多帧 3、几个帆加片断
-    
-    
     if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0, [PROTOCOL_RECV_HEAD length])] )
     {
-        //NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
         NSRange rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
         NSUInteger idx = 0;
         for ( ; NSNotFound != rret.location; )
         {
-            if ( 3 == idx )
-            {
-                assert(false);
-            }
             NSData *oneFrame = [[msg substringWithRange:NSMakeRange(idx, rret.location + 1 - idx)] dataUsingEncoding:NSASCIIStringEncoding];
             [[AppDelegate shareAppDelegate] didReceiveData:oneFrame];
             
@@ -280,10 +272,6 @@
             
             if ( idx < [msg length] )
             {
-                if ( 3 == idx )
-                {
-                    assert(false);
-                }
                 rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
             }
             else
@@ -293,10 +281,6 @@
         }
         if ( idx < [msg length] )
         {
-            if ( 3 == idx )
-            {
-                assert(false);
-            }
             rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
             [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
             NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
@@ -305,7 +289,6 @@
     }
     else
     {
-        //NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
         NSRange rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
         NSUInteger idx = 0;
         if ( NSNotFound == rret.location )
@@ -320,10 +303,6 @@
         {
             for ( ; NSNotFound != rret.location; )
             {
-                if ( 3 == idx )
-                {
-                    assert(false);
-                }
                 NSData *oneFrame = [[msg substringWithRange:NSMakeRange(idx, rret.location + 1 - idx)] dataUsingEncoding:NSASCIIStringEncoding];
                 if ( [AppDelegate shareAppDelegate].readData == nil )
                 {
@@ -354,8 +333,6 @@
         }
 
     }
-    
-
     
     //waiting for next package
     [_socket readDataWithTimeout:-1 tag:0];
@@ -521,7 +498,7 @@
 
 - (void)onSocketDidDisconnect:(AsyncSocket *)sock
 {
-    NSLog(@"%s %d",__FUNCTION__,__LINE__);
+    NSLog(@"%s %d error:%d",__FUNCTION__,__LINE__,error);
     _bConnected = NO;
     [_socket release];
     _socket = nil;
