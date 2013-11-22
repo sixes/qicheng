@@ -22,6 +22,8 @@
     NSMutableData *_readData;
     CGFloat _width;
     CGFloat _height;
+
+    NSCharacterSet * _recvTailSet;
 }
 
 @property (assign) CGFloat height;
@@ -30,6 +32,7 @@
 @property (nonatomic,assign) LoginViewController *loginViewController;
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
 @property (strong, nonatomic) UIWindow *window;
+@property (nonatomic,assign) NSCharacterSet *recvTailSet;
 
 - (void)didLoginSuccess;
 + (AppDelegate*) shareAppDelegate;
