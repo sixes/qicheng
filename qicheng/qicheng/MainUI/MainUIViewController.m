@@ -8,6 +8,8 @@
 
 #import "MainUIViewController.h"
 #import "AppDelegate.h"
+#import "MenuItemView.h"
+
 @interface MainUIViewController ()
 
 @end
@@ -33,10 +35,39 @@
     // [self.view addSubview:imgView];
     // [imgView release];
     
-    UIImage *bgImg = [UIImage imageNamed:@"bg_main_ui.jpeg"];
+    UIImage *bgImg = [UIImage imageNamed:@"bg_main_ui.jpg"];
     self.view = [[UIImageView alloc] initWithImage:bgImg];
     [self.view setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
     self.view.userInteractionEnabled = YES;
+    
+    UIImage *img1 = [UIImage imageNamed:@"scene.png"];
+    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 20, 130, 130) image:img1 menuName:@"场景" menuItemType:0 dispatchEvent:YES];
+    [self.view addSubview:item1];
+    [item1 release];
+    
+    UIImage *img2 = [UIImage imageNamed:@"main_home_room.png"];
+//    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
+    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 20, 130, 130) image:img2 menuName:@"区域" menuItemType:1 dispatchEvent:YES];
+    [self.view addSubview:item2];
+    [item2 release];
+    
+    UIImage *img3 = [UIImage imageNamed:@"main_home_devices.png"];
+    //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
+    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 150, 130, 130) image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:YES];
+    [self.view addSubview:item3];
+    [item3 release];
+}
+
+- (void)onTapMenuItemWithType:(NSUInteger)type
+{
+    NSLog(@"fun:%s ln:%d type:%d",__FUNCTION__,__LINE__,type);
+    if ( 2 == type )
+    {
+        if ( ! _functionViewController ) {
+            _functionViewController = [[FunctionViewController alloc] init];
+        }
+        [self presentViewController:_functionViewController animated:YES completion:Nil];
+    }
 }
 
 - (void)viewDidLoad
@@ -50,5 +81,7 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
 
 @end

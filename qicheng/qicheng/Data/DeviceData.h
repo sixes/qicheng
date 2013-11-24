@@ -11,11 +11,11 @@
 @interface CDeviceData : NSObject
 {
 	NSString *_strSysDateTime;
-	NSDate _sysDateTime;
+	NSDate *_sysDateTime;
 
-	NSMutableArray _relayStatus;
-	NSMutableArray _alarmCount;
-	NSMutableArray _sensorStatus;
+	NSMutableArray *_relayStatus;
+	NSMutableArray *_alarmCount;
+	NSMutableArray *_sensorStatus;
 	BOOL _bAlarmOpen;
 
 	NSUInteger relay7status;
@@ -26,11 +26,11 @@
     NSString *_strProt;
 }
 
-@property (nonatomic,retain) NSMutableArray relayStatus;
-@property (nonatomic,retain) NSMutableArray alarmCount;
-@property (nonatomic,retain) NSMutableArray sensorStatus;
+@property (nonatomic,retain) NSMutableArray *relayStatus;
+@property (nonatomic,retain) NSMutableArray *alarmCount;
+@property (nonatomic,retain) NSMutableArray *sensorStatus;
 @property (nonatomic,copy) NSString *originalSysDateTime;
-@property (nonatomic,assign) NSDate sysDateTime;
+@property (nonatomic,assign) NSDate *sysDateTime;
 
 
 @property (nonatomic,copy) NSString *loginDomain;

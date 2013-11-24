@@ -6,7 +6,7 @@
 //  Copyright (c) 2013年 tony. All rights reserved.
 //
 
-#import "CLoginInfo.h"
+#import "LoginInfo.h"
 
 @implementation CLoginInfo
 

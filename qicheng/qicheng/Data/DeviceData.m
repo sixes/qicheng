@@ -21,12 +21,11 @@
 
 static CDeviceData * _shareDeviceData;
 
-+ (CDeviceData *)shareLoginInfo
++ (CDeviceData *)shareDeviceData
 {
     if ( ! _shareDeviceData )
     {
-        _shareDeviceData = [[CDeviceData alloc] init];
-        [self initWithRelayStatusCount:COUNT_RELAY alarmCount:COUNT_ALARM sensorStatusCount:COUNT_SENSOR];
+        _shareDeviceData = [[CDeviceData alloc] initWithRelayStatusCount:COUNT_RELAY alarmCount:COUNT_ALARM sensorStatusCount:COUNT_SENSOR];
     }
     return _shareDeviceData;
 }

@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FunctionViewController.h"
 
 @interface MainUIViewController : UIViewController
+{
+    FunctionViewController *_functionViewController;
+}
+
+- (void)onTapMenuItemWithType:(NSUInteger)type;
 
 @end

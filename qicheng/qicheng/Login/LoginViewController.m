@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "CLoginInfo.h"
+#import "LoginInfo.h"
 #import "LoginViewController.h"
 #import "MainUIViewController.h"
 
@@ -73,7 +73,7 @@
     //[imgView setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
     
     self.view = [[UIImageView alloc] initWithImage:imgBg];
-    [self.view setFrame::CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
+    [self.view setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
     self.view.userInteractionEnabled = YES;
     //[self.view addSubview:imgView];
     

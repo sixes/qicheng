@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "CLoginInfo.h"
+#import "LoginInfo.h"
 #import "Config.h"
 #import "MainUIViewController.h"
 
@@ -91,7 +91,7 @@
 {
     NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
     
-    NSUInteger functionNameIdx = [PROTOCOL_HEAD length] + LENGTH_MODULE_ADDR + LENGTH_DATA_LENGTH;
+    NSUInteger functionNameIdx = [PROTOCOL_RECV_HEAD length] + LENGTH_MODULE_ADDR + LENGTH_DATA_LENGTH;
     if ( functionNameIdx >= [msg length] )
     {
         assert(false);
@@ -101,7 +101,7 @@
     {
         assert(false);
     }
-    NSString *realData = [msg substringWithRange:NSMakeRange(functionNameIdx + 1, [msg length] - functionNameIdx - 1 - [RPOTOCOL_TAIL length])];
+    NSString *realData = [msg substringWithRange:NSMakeRange(functionNameIdx + 1, [msg length] - functionNameIdx - 1 - [PROTOCOL_RECV_TAIL length])];
     
     [msg release];
     [self didReceiveDataWithFunctionName:functionName data:realData];
@@ -257,11 +257,12 @@
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSString *msg = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-
+    
+    NSCharacterSet *cSet = [NSCharacterSet characterSetWithCharactersInString:@"#"];
     //1. 完整的一帧 2、完整的多帧 3、几个帆加片断
     if ( NSOrderedSame == [msg compare:PROTOCOL_RECV_HEAD options:NSLiteralSearch range:NSMakeRange(0, [PROTOCOL_RECV_HEAD length])] )
     {
-        NSRange rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
+        NSRange rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
         NSUInteger idx = 0;
         for ( ; NSNotFound != rret.location; )
         {
@@ -281,7 +282,7 @@
         }
         if ( idx < [msg length] )
         {
-            rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+            rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
             [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
             NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
             [[AppDelegate shareAppDelegate].readData appendData:leftData];
@@ -289,7 +290,7 @@
     }
     else
     {
-        NSRange rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
+        NSRange rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(0, [msg length])];
         NSUInteger idx = 0;
         if ( NSNotFound == rret.location )
         {
@@ -316,7 +317,7 @@
                 
                 if ( idx < [msg length] )
                 {
-                    rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+                    rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
                 }
                 else
                 {
@@ -325,7 +326,7 @@
             }
             if ( idx < [msg length] )
             {
-                rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+                rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
                 [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
                 NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
                 [[AppDelegate shareAppDelegate].readData appendData:leftData];
@@ -498,7 +499,7 @@
 
 - (void)onSocketDidDisconnect:(AsyncSocket *)sock
 {
-    NSLog(@"%s %d error:%d",__FUNCTION__,__LINE__,error);
+    NSLog(@"%s %d",__FUNCTION__,__LINE__);
     _bConnected = NO;
     [_socket release];
     _socket = nil;
