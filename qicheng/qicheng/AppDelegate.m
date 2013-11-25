@@ -273,7 +273,7 @@
             
             if ( idx < [msg length] )
             {
-                rret = [msg rangeOfCharacterFromSet:[AppDelegate shareAppDelegate].recvTailSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+                rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
             }
             else
             {

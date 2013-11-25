@@ -8,14 +8,26 @@
 
 #import <UIKit/UIKit.h>
 #import "iCarousel.h"
-@interface FunctionViewController : UIViewController <iCarouselDataSource,iCarouselDelegate>
+@interface FunctionViewController : UIViewController <iCarouselDataSource,iCarouselDelegate,UITableViewDataSource,UITableViewDelegate>
 {
     iCarousel *_carousel;
     NSMutableArray *_items;
+    
+    NSMutableArray *_curtainArray;
+    
+    UITableView *_tableView;
+    
+    NSUInteger _currentIdx;
+    
+    UIView *_curtainView;
+    UIImageView *_curtainAnimationView;
 }
 
 @property (nonatomic,retain) iCarousel *carousel;
 @property (nonatomic,retain) NSMutableArray *items;
+@property (nonatomic,retain) NSMutableArray *curtainArray;
 
 - (void)onTapIndex:(NSUInteger)index;
+
+- (void)loadCurtainView;
 @end
