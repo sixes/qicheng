@@ -22,26 +22,17 @@
         _rect = frame;
         _MenuItemtype = type;
         _bDis = bDis;
-       // self setAutoresizingMask:
-       // UIImage *img = [UIImage imageNamed:@"main_home_room.png"];
-        _imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
-       // [imgView setFrame:CGRectMake(0,0, frame.size.width, frame.size.height)];
-        [self addSubview:_imgView];
-       // [imgView release];
 
-        
-        
-//        NSLog(@"af set x:%f y:%f w:%f h:%f",imgView.frame.origin.x,imgView.frame.origin.y,imgView.frame.size.width,frame.size.height);
-        
-//        NSString *name = [NSString stringWithFormat:@"name"];
+        _imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
+        [self addSubview:_imgView];
+
         _lbl = [[UILabel alloc] initWithFrame:CGRectMake(0,frame.size.height -25,frame.size.width,20)];
         [_lbl setFont:[UIFont boldSystemFontOfSize:20.0]];
         [_lbl setTextAlignment:NSTextAlignmentCenter];
         [_lbl setTextColor:[UIColor whiteColor]];
-        //[_lbl setText:name];
-        
-        [self setImage:img menuName:name];
         [self addSubview:_lbl];
+
+        [self setImage:img menuName:name];
     }
     return self;
 }
@@ -62,10 +53,10 @@
 		touch = [[touches allObjects] objectAtIndex:0];
 		point = [touch locationInView:self];
         NSLog(@"tap x:%f y:%f menuItemType:%d",point.x,point.y,_MenuItemtype);
-        if ( _bDis ) {
+        if ( _bDis )
+        {
             [[AppDelegate shareAppDelegate].mainUIViewController onTapMenuItemWithType:_MenuItemtype];
         }
-        
 	}
 }
 

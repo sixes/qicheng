@@ -20,6 +20,8 @@
 
 @property (nonatomic,assign) CGRect rect;
 @property (nonatomic,assign) NSUInteger menuItemType;
+
 - (id)initWithFrame:(CGRect)frame image:(UIImage *)img menuName:(NSString *)name menuItemType:(NSUInteger)type dispatchEvent:(BOOL)bDis;
 - (void)setImage:(UIImage*)img menuName:(NSString*)name;
+
 @end
