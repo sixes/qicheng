@@ -13,6 +13,7 @@
 
 @synthesize relayStatus     = _relayStatus;
 
+@synthesize curtainStatus   = _strCurtainStatus;
 @synthesize loginDomain     = _strDomain;
 @synthesize loginIp         = _strIp;
 @synthesize loginModuleIdx  = _strModuleIdx;
@@ -39,5 +40,30 @@ static CDeviceData * _shareDeviceData;
         _sensorStatus = [[NSMutableArray alloc] initWithCapacity:ssCount];
     }
     return self;
+}
+
+- (void)setCurtainStatus:(NSString*)status
+{
+    if ( NSOrderedSame == [status compare:FUNCTION_NAME_OPEN_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_OPEN_CURTAIN length])] ) )
+    {
+        _strCurtainStatusName = CURTAIN_OPEN_NAME;
+    }
+    else if ( NSOrderedSame == [status compare:FUNCTION_NAME_CLOSE_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_CLOSE_CURTAIN length])] ) )
+    {
+        _strCurtainStatusName = CURTAIN_CLOSE_NAME;
+    }
+    else if ( NSOrderedSame == [status compare:FUNCTION_NAME_STOP_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_STOP_CURTAIN length])] ) )
+    {
+        _strCurtainStatusName = CURTAIN_STOP_NAME;
+    }
+    else
+    {
+        assert(false);
+    }
+    _strCurtainStatus = status;
+}
+- (NSString*)getCurtainStatus
+{
+    return _strCurtainStatusName;
 }
 @end

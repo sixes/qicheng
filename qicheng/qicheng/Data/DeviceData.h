@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+static const NSString* CURTAIN_OPEN_NAME = @"开启";
+static const NSString* CURTAIN_STOP_NAME = @"关闭";
+static const NSString* CURTAIN_CLOSE_NAME = @"停";
+
 @interface CDeviceData : NSObject
 {
 	NSString *_strSysDateTime;
@@ -19,6 +23,8 @@
 	BOOL _bAlarmOpen;
 
 	NSUInteger relay7status;
+    NSString *_strCurtainStatus;
+    NSString *_strCurtainStatusName;
     NSString *_strDomain;
     NSString *_strIp;
     NSString *_strModuleIdx;
@@ -29,6 +35,7 @@
 @property (nonatomic,retain) NSMutableArray *relayStatus;
 @property (nonatomic,retain) NSMutableArray *alarmCount;
 @property (nonatomic,retain) NSMutableArray *sensorStatus;
+@property (nonatomic,copy) NSString *curtainStatus;
 @property (nonatomic,copy) NSString *originalSysDateTime;
 @property (nonatomic,assign) NSDate *sysDateTime;
 
@@ -41,4 +48,7 @@
 
 + (CDeviceData *)shareDeviceData;
 - (id)initWithRelayStatusCount:(NSUInteger) relayStatusCount alarmCount:(NSUInteger)aCount sensorStatusCount:(NSUInteger)ssCount;
+
+- (void)setCurtainStatus:(NSString*)status;
+- (NSString*)getCurtainStatus;
 @end

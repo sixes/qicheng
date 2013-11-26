@@ -30,4 +30,10 @@
 - (void)onTapIndex:(NSUInteger)index;
 
 - (void)loadCurtainView;
+
+
+- (void)didCloseCurtain;
+- (void)didOpenCurtain;
+- (void)didStopCurtain;
+
 @end
