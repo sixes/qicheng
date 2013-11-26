@@ -18,6 +18,7 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
 	NSDate *_sysDateTime;
 
 	NSMutableArray *_relayStatus;
+    NSMutableArray *_relayName;
 	NSMutableArray *_alarmCount;
 	NSMutableArray *_sensorStatus;
 	BOOL _bAlarmOpen;
@@ -31,7 +32,7 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
     NSString *_strPassword;
     NSString *_strProt;
 }
-
+@property (nonatomic,retain) NSMutableArray *relayName;
 @property (nonatomic,retain) NSMutableArray *relayStatus;
 @property (nonatomic,retain) NSMutableArray *alarmCount;
 @property (nonatomic,retain) NSMutableArray *sensorStatus;

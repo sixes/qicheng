@@ -21,8 +21,11 @@
     
     UIView *_curtainView;
     UIImageView *_curtainAnimationView;
+    
+    BOOL _bFlipped;
 }
 
+@property (nonatomic,assign) BOOL bFilpped;
 @property (nonatomic,retain) iCarousel *carousel;
 @property (nonatomic,retain) NSMutableArray *items;
 @property (nonatomic,retain) NSMutableArray *curtainArray;
@@ -35,5 +38,6 @@
 - (void)didCloseCurtain;
 - (void)didOpenCurtain;
 - (void)didStopCurtain;
-
+- (void)didOpenRelayAtIndex:(NSInteger)index;
+- (void)didCloseRelayAtIndex:(NSInteger)index;
 @end

@@ -10,6 +10,7 @@
 #import "LoginInfo.h"
 #import "Config.h"
 #import "MainUIViewController.h"
+#import "DeviceData.h"
 
 @implementation AppDelegate
 
@@ -163,16 +164,23 @@
                 {
                 
                     NSUInteger data = strtoul([[msg substringWithRange:NSMakeRange(0,LENGTH_QUERY_ALL_RELAY_STATUS)] UTF8String],0,16);
-                    NSUInteger relay7status = data & ( 1 << 8 );
-                    NSUInteger relay6status = data & ( 1 << 7 );
-                    NSUInteger relay5status = data & ( 1 << 6 );
-                    NSUInteger relay4status = data & ( 1 << 5 );
-                    NSUInteger relay3status = data & ( 1 << 4 );
-                    NSUInteger relay2status = data & ( 1 << 3 );
-                    NSUInteger relay1status = data & ( 1 << 2 );
+                    NSUInteger relay7status = data & ( 1 << 7 );
+                    NSUInteger relay6status = data & ( 1 << 6 );
+                    NSUInteger relay5status = data & ( 1 << 5 );
+                    NSUInteger relay4status = data & ( 1 << 4 );
+                    NSUInteger relay3status = data & ( 1 << 3 );
+                    NSUInteger relay2status = data & ( 1 << 2 );
+                    NSUInteger relay1status = data & ( 1 << 1 );
                     NSUInteger relay0status = data & ( 1 );
 
-                
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay0status] atIndexedSubscript:0];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay1status] atIndexedSubscript:1];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay2status] atIndexedSubscript:2];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay3status] atIndexedSubscript:3];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay4status] atIndexedSubscript:4];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay5status] atIndexedSubscript:5];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay6status] atIndexedSubscript:6];
+                    [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay7status] atIndexedSubscript:7];
                 }
                 else
                 {
@@ -247,61 +255,35 @@
             break;
             case FUNCTION_INDEX_OPEN_CURTAIN:
             {
-                if ( LENGTH_OPEN_CURTAIN == [msg length] )
-                {
-                    if ( NSOrderedSame == [msg compare:FUNCTION_NAME_OPEN_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_OPEN_CURTAIN length])] )
-                    {
+                
+                    
                         [self didOpenCurtain];
-                    }
-                    else
-                    {
-                        assert(false);
-                    }
-                }
-                else
-                {
-                    assert(false);
-                }
+                    
             }   
             break; 
             case FUNCTION_INDEX_STOP_CURTAIN:
             {
-                if ( LENGTH_STOP_CURTAIN == [msg length] )
-                {
-                    if ( NSOrderedSame == [msg compare:FUNCTION_NAME_STOP_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_STOP_CURTAIN length])] )
-                    {
+            
+                    
                         [self didStopCurtain];
-                    }
-                    else
-                    {
-                        assert(false);
-                    }
-                }
-                else
-                {
-                    assert(false);
-                }
+                   
             }   
             break; 
             case FUNCTION_INDEX_CLOSE_CURTAIN:
             {
-                if ( LENGTH_CLOSE_CURTAIN == [msg length] )
-                {
-                    if ( NSOrderedSame == [msg compare:FUNCTION_NAME_CLOSE_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_CLOSE_CURTAIN length])] )
-                    {
-                        [self didCloseCurtain];
-                    }
-                    else
-                    {
-                        assert(false);
-                    }
-                }
-                else
-                {
-                    assert(false);
-                }
+                [self didCloseCurtain];
             }   
-            break; 
+            break;
+            case FUNCTION_INDEX_OPEN_RELAY:
+        {
+            [self didOpenRelayAtIndex:[msg integerValue]];
+        }
+            break;
+            case FUNCTION_INDEX_CLOSE_RELAY:
+        {
+            [self didCloseRelayAtIndex:[msg integerValue]];
+        }
+            break;
         default:
             break;
     }
@@ -703,5 +685,29 @@
 - (void)didStopCurtain
 {
     [self.functionViewController didStopCurtain];
+}
+
+- (void)openRelayAtIndex:(NSUInteger)index
+{
+    NSString *str = [NSString stringWithFormat:@"%2lu",(unsigned long)index];
+    NSData *data = [str dataUsingEncoding:NSASCIIStringEncoding];
+    [self sendDataWithFunctionName:FUNCTION_NAME_OPEN_RELAY data:data];
+}
+
+- (void)didOpenRelayAtIndex:(NSInteger)index
+{
+    [self.functionViewController didOpenRelayAtIndex:index];
+}
+
+- (void)closeRelayAtIndex:(NSUInteger)index
+{
+    NSString *str = [NSString stringWithFormat:@"%2lu",(unsigned long)index];
+    NSData *data = [str dataUsingEncoding:NSASCIIStringEncoding];
+    [self sendDataWithFunctionName:FUNCTION_NAME_CLOSE_RELAY data:data];
+}
+
+- (void)didCloseRelayAtIndex:(NSInteger)index
+{
+    [self.functionViewController didCloseRelayAtIndex:index];
 }
 @end

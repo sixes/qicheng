@@ -10,13 +10,15 @@
 #import "AppDelegate.h"
 #import "iCarousel.h"
 #import "MenuItemView.h"
-
+#import "DeviceData.h"
+#import "Config.h"
 @interface FunctionViewController ()
 
 @end
 
 @implementation FunctionViewController
 
+@synthesize bFilpped = _bFlipped;
 @synthesize carousel = _carousel;
 @synthesize items = _items;
 @synthesize curtainArray = _curtainArray;
@@ -31,6 +33,7 @@
     _tableView = [[UITableView alloc] initWithFrame:CGRectMake(30, 40, 260, 300) style:UITableViewStylePlain];
     [_tableView setDataSource:self];
     [_tableView setDelegate:self];
+    [_tableView setBackgroundColor:[UIColor clearColor]];
     [self.view addSubview:_tableView];
     
     
@@ -56,6 +59,7 @@
     [self.curtainArray addObject:@"窗帘"];
     
     _currentIdx = 0;
+    _bFlipped = NO;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -70,7 +74,11 @@
         case 0:
             return [self.curtainArray count];
             break;
-            
+        case 1:
+        {
+            return [[CDeviceData shareDeviceData].relayName count];
+        }
+        break;
         default:
             return 0;
             break;
@@ -86,13 +94,79 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellWithIdentifier];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
+        sw.tag = [indexPath row];
+        [sw addTarget:self action:@selector(updateSwitchAtIndexPath:) forControlEvents:UIControlEventValueChanged];
+        cell.accessoryView = sw;
+        [sw release];
+        
+        switch ( _currentIdx )
+        {
+            case 1:
+            {
+                
+            }
+                break;
+            case 0:
+            default:
+                break;
+        }
     }
-    cell.textLabel.text =  [self.curtainArray objectAtIndex:row];
-    cell.detailTextLabel.text = [CDeviceData shareDeviceData].curtainStatus;
-    NSString *path = [[NSBundle mainBundle] pathForResource:[item objectForKey:@"imageKey"] ofType:@"png"];
-    UIImage *theImage = [UIImage imageWithContentsOfFile:path];
-    cell.imageView.image = theImage;
+    switch ( _currentIdx )
+    {
+        case 0:
+        {
+            cell.textLabel.text =  [self.curtainArray objectAtIndex:indexPath.row];
+            cell.detailTextLabel.text = [[CDeviceData shareDeviceData] getCurtainStatus];
+            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+            cell.imageView.image = theImage;
+            [cell.accessoryView setHidden:YES];
+        }
+        break;
+        case 1:
+        {
+            [cell.accessoryView setHidden:NO];
+            cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
+            //[[CDeviceData shareDeviceData] getCurtainStatus];
+            
+            NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].relayStatus objectAtIndexedSubscript:indexPath.row];
+            if ( [num integerValue] > 0 )
+            {
+                cell.detailTextLabel.text = @"开启";
+                UISwitch *sw = (UISwitch*)cell.accessoryView;
+                sw.on = YES;
+            }
+            else
+            {
+                cell.detailTextLabel.text = @"关闭";
+                UISwitch *sw = (UISwitch*)cell.accessoryView;
+                sw.on = NO;
+            }
+            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+            cell.imageView.image = theImage;
+            
+        }
+        break;
+        default:
+            break;
+    }
+
     return cell;
+}
+
+- (void)updateSwitchAtIndexPath:(UISwitch *)sw
+{
+    if ( YES == sw.on )
+    {
+        [[AppDelegate shareAppDelegate] openRelayAtIndex:(NSUInteger)sw.tag];
+    }
+    else
+    {
+        [[AppDelegate shareAppDelegate] closeRelayAtIndex:(NSUInteger)sw.tag];
+    }
+    //NSLog(@"on tap sw index:%d",sw.tag);
 }
 
 - (void)loadCurtainView
@@ -109,27 +183,34 @@
     
     UIButton *btnOpen = [[UIButton alloc] initWithFrame:CGRectMake(35, 250, 60, 60)];
     UIImage *btnOpenImg = [UIImage imageNamed:@"device_stop_pressed.png"];
-    [btnOpen setImage:btnOpenImg forState:UIControlStateNormal];
+    
     [btnOpen setTitle:CURTAIN_OPEN_NAME forState:UIControlStateNormal];
+//    [btnOpen setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    btnOpen.titleLabel.font = [UIFont systemFontOfSize:20.0];
+//    [btnOpen setImage:btnOpenImg forState:UIControlStateNormal];
+    [btnOpen setBackgroundImage:btnOpenImg forState:UIControlStateNormal];
     [btnOpen addTarget:self action:@selector(onTapOpenCurtain) forControlEvents:UIControlEventTouchUpInside];
     [_curtainView addSubview:btnOpen];
     [btnOpen release];
 
-    UIButton *btnStop = [[UIButton alloc] initWithFrame:CGRectMake(110, 250, 60, 60)];
+    
+    UIButton *btnStop = [[UIButton alloc] initWithFrame:CGRectMake(185, 250, 60, 60)];
     UIImage *btnStopImg = [UIImage imageNamed:@"device_stop_pressed.png"];
-    [btnStop setImage:btnStopImg forState:UIControlStateNormal];
-    [btnStop setTitle:CURTAIN_CLOSE_NAME forState:UIControlStateNormal];
+    [btnStop setBackgroundImage:btnStopImg forState:UIControlStateNormal];
+    [btnStop setTitle:CURTAIN_STOP_NAME forState:UIControlStateNormal];
     [btnStop addTarget:self action:@selector(onTapStopCurtain) forControlEvents:UIControlEventTouchUpInside];
     [_curtainView addSubview:btnStop];
     [btnStop release];
-
-    UIButton *btnClose = [[UIButton alloc] initWithFrame:CGRectMake(185, 250, 60, 60)];
+    
+    UIButton *btnClose = [[UIButton alloc] initWithFrame:CGRectMake(110, 250, 60, 60)];
     UIImage *btnCloseImg = [UIImage imageNamed:@"device_stop_pressed.png"];
-    [btnClose setImage:btnImg forState:UIControlStateNormal];
-    [btnClose setTitle:CURTAIN_STOP_NAME forState:UIControlStateNormal];
+    [btnClose setBackgroundImage:btnCloseImg forState:UIControlStateNormal];
+    [btnClose setTitle:CURTAIN_CLOSE_NAME forState:UIControlStateNormal];
     [btnClose addTarget:self action:@selector(onTapCloseCurtain) forControlEvents:UIControlEventTouchUpInside];
     [_curtainView addSubview:btnClose];
     [btnClose release];
+    
+    
 }
 
 - (void)onTapStopCurtain
@@ -177,7 +258,7 @@
         default:
             break;
     }
-
+    _bFlipped = YES;
 }
 
 - (NSUInteger) numberOfItemsInCarousel:(iCarousel *)carousel
@@ -203,6 +284,14 @@
             
         default:
             break;
+    }
+    if ( YES == _bFlipped )
+    {
+        if ( _curtainView )
+        {
+            [_curtainView removeFromSuperview];
+            [_tableView setHidden:NO];
+        }
     }
     [_tableView reloadData];
 }
@@ -259,7 +348,19 @@
             }
         }
         break;
-            
+        case 1:
+        {
+            UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
+            MenuItemView *itemView = (MenuItemView*)view;
+            if ( itemView )
+            {
+                [itemView setImage:img menuName:@"继电器"];
+            }
+            else
+            {
+                assert(false);
+            }
+        }
         default:
             break;
     }
@@ -304,7 +405,7 @@
     CATransition *animation = [CATransition animation];
     animation.delegate = self;
     animation.duration = 1;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
     // 设定动画类型
     // kCATransitionFade 淡化
     // kCATransitionPush 推挤
@@ -332,6 +433,19 @@
 {
 
     [CDeviceData shareDeviceData].curtainStatus = FUNCTION_NAME_STOP_CURTAIN;
+    [_tableView reloadData];
+}
+
+- (void)didOpenRelayAtIndex:(NSInteger)index
+{
+    [[CDeviceData shareDeviceData].relayStatus setObject:[NSNumber numberWithUnsignedLong:1] atIndexedSubscript:index];
+    NSLog(@"relay status size:%d",[[CDeviceData shareDeviceData].relayStatus count]);
+    [_tableView reloadData];
+}
+
+- (void)didCloseRelayAtIndex:(NSInteger)index
+{
+    [[CDeviceData shareDeviceData].relayStatus setObject:[NSNumber numberWithUnsignedLong:0] atIndexedSubscript:index];
     [_tableView reloadData];
 }
 @end

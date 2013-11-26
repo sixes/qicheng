@@ -10,6 +10,8 @@
 
 @interface CLoginInfo : NSObject
 {
+    BOOL _bLogined;
+    
     NSString *_strDomain;
     NSString *_strIp;
     NSString *_strModuleIdx;

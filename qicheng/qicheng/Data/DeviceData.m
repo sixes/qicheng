@@ -11,6 +11,7 @@
 
 @implementation CDeviceData
 
+@synthesize relayName       = _relayName;
 @synthesize relayStatus     = _relayStatus;
 
 @synthesize curtainStatus   = _strCurtainStatus;
@@ -36,23 +37,33 @@ static CDeviceData * _shareDeviceData;
     if ( self = [super init] )
     {
         _relayStatus = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
+        _relayName = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
         _alarmCount = [[NSMutableArray alloc] initWithCapacity:aCount];
         _sensorStatus = [[NSMutableArray alloc] initWithCapacity:ssCount];
+        
+        [_relayName addObject:@"继电器1"];
+        [_relayName addObject:@"继电器2"];
+        [_relayName addObject:@"继电器3"];
+        [_relayName addObject:@"继电器4"];
+        [_relayName addObject:@"继电器5"];
+        [_relayName addObject:@"继电器6"];
+        [_relayName addObject:@"继电器7"];
+        [_relayName addObject:@"继电器8"];
     }
     return self;
 }
 
 - (void)setCurtainStatus:(NSString*)status
 {
-    if ( NSOrderedSame == [status compare:FUNCTION_NAME_OPEN_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_OPEN_CURTAIN length])] ) )
+    if ( NSOrderedSame == [status compare:FUNCTION_NAME_OPEN_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_OPEN_CURTAIN length])] )
     {
         _strCurtainStatusName = CURTAIN_OPEN_NAME;
     }
-    else if ( NSOrderedSame == [status compare:FUNCTION_NAME_CLOSE_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_CLOSE_CURTAIN length])] ) )
+    else if ( NSOrderedSame == [status compare:FUNCTION_NAME_CLOSE_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_CLOSE_CURTAIN length])] )
     {
         _strCurtainStatusName = CURTAIN_CLOSE_NAME;
     }
-    else if ( NSOrderedSame == [status compare:FUNCTION_NAME_STOP_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_STOP_CURTAIN length])] ) )
+    else if ( NSOrderedSame == [status compare:FUNCTION_NAME_STOP_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_STOP_CURTAIN length])] )
     {
         _strCurtainStatusName = CURTAIN_STOP_NAME;
     }

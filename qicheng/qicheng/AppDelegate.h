@@ -53,11 +53,15 @@
 - (void)queryAllSensorStatus;
 - (void)queryAllTimerStatus;
 - (void)querySysDateTime;
+- (void)openRelayAtIndex:(NSUInteger)index;
+- (void)closeRelayAtIndex:(NSUInteger)index;
 
 //response
 - (void)didCloseCurtain;
 - (void)didOpenCurtain;
 - (void)didStopCurtain;
+- (void)didOpenRelayAtIndex:(NSInteger)index;
+- (void)didCloseRelayAtIndex:(NSInteger)index;
 
 - (void)prepareSendData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag;
 - (void)sendDataWithFunctionName:(NSString *)name data:(NSData *)aData;
