@@ -46,8 +46,6 @@
     _carousel.delegate = self;
     _carousel.dataSource = self;
     [self.view addSubview:_carousel];
-    
-
 }
 
 - (void)viewDidLoad
@@ -82,17 +80,19 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-        static NSString *CellWithIdentifier = @"Cell";
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellWithIdentifier];
-        if (cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:CellWithIdentifier];
-        }
-        NSUInteger row = [indexPath row];
-        cell.textLabel.text = [self.curtainArray objectAtIndex:row];
-       // cell.imageView.image = [UIImage imageNamed:@"green.png"];
-        cell.detailTextLabel.text = @"详细信息";
-        return cell;
-    
+    static const NSString *CellWithIdentifier = @"FunctionViewControllerTableIdentifier";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellWithIdentifier];
+    if (cell == nil)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellWithIdentifier];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    cell.textLabel.text =  [self.curtainArray objectAtIndex:row];
+    cell.detailTextLabel.text = [CDeviceData shareDeviceData].curtainStatus;
+    NSString *path = [[NSBundle mainBundle] pathForResource:[item objectForKey:@"imageKey"] ofType:@"png"];
+    UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+    cell.imageView.image = theImage;
+    return cell;
 }
 
 - (void)loadCurtainView
@@ -105,28 +105,47 @@
     [_imgView release];
     
     _curtainAnimationView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 0, 220, 250)];
-    [_curtainView addSubview:_curtainAnimationView];
+   
     
     UIButton *btnOpen = [[UIButton alloc] initWithFrame:CGRectMake(35, 250, 60, 60)];
-    UIImage *btnImg = [UIImage imageNamed:@"device_stop_pressed.png"];
-    [btnOpen setImage:btnImg forState:UIControlStateNormal];
+    UIImage *btnOpenImg = [UIImage imageNamed:@"device_stop_pressed.png"];
+    [btnOpen setImage:btnOpenImg forState:UIControlStateNormal];
+    [btnOpen setTitle:CURTAIN_OPEN_NAME forState:UIControlStateNormal];
     [btnOpen addTarget:self action:@selector(onTapOpenCurtain) forControlEvents:UIControlEventTouchUpInside];
     [_curtainView addSubview:btnOpen];
     [btnOpen release];
+
+    UIButton *btnStop = [[UIButton alloc] initWithFrame:CGRectMake(110, 250, 60, 60)];
+    UIImage *btnStopImg = [UIImage imageNamed:@"device_stop_pressed.png"];
+    [btnStop setImage:btnStopImg forState:UIControlStateNormal];
+    [btnStop setTitle:CURTAIN_CLOSE_NAME forState:UIControlStateNormal];
+    [btnStop addTarget:self action:@selector(onTapStopCurtain) forControlEvents:UIControlEventTouchUpInside];
+    [_curtainView addSubview:btnStop];
+    [btnStop release];
+
+    UIButton *btnClose = [[UIButton alloc] initWithFrame:CGRectMake(185, 250, 60, 60)];
+    UIImage *btnCloseImg = [UIImage imageNamed:@"device_stop_pressed.png"];
+    [btnClose setImage:btnImg forState:UIControlStateNormal];
+    [btnClose setTitle:CURTAIN_STOP_NAME forState:UIControlStateNormal];
+    [btnClose addTarget:self action:@selector(onTapCloseCurtain) forControlEvents:UIControlEventTouchUpInside];
+    [_curtainView addSubview:btnClose];
+    [btnClose release];
+}
+
+- (void)onTapStopCurtain
+{
+    [[AppDelegate shareAppDelegate] stopCurtain];
+}
+
+- (void)onTapCloseCurtain
+{
+    [[AppDelegate shareAppDelegate] closeCurtain];
 }
 
 - (void)onTapOpenCurtain
 {
-    NSLog(@"ontapButn");
-    UIImage *imgOn = [UIImage imageNamed:@"device_control_shade_on.png"];
-    UIImage *imgOff = [UIImage imageNamed:@"device_control_shade_off.png"];
-    UIImage *imgMid = [UIImage imageNamed:@"device_control_shade_mid.png"];
-    _curtainAnimationView.animationImages = [NSArray arrayWithObjects:imgOn,imgMid,imgOff,nil];
-    [_curtainAnimationView setAnimationDuration:2.0];
-    [_curtainAnimationView setAnimationRepeatCount:1];
-    [_curtainAnimationView startAnimating];
-    
-    
+    //NSLog(@"ontapButn");
+    [[AppDelegate shareAppDelegate] openCurtain];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -230,7 +249,8 @@
         {
             UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
             MenuItemView *itemView = (MenuItemView*)view;
-            if ( itemView ) {
+            if ( itemView )
+            {
                 [itemView setImage:img menuName:@"窗帘"];
             }
             else
@@ -264,4 +284,54 @@
     self.items = nil;
 }
 
+- (void)didCloseCurtain
+{
+    [CDeviceData shareDeviceData].curtainStatus = FUNCTION_NAME_CLOSE_CURTAIN;
+    [_tableView reloadData];
+}
+
+- (void)didOpenCurtain
+{
+    UIImage *imgOn = [UIImage imageNamed:@"device_control_shade_on.png"];
+    //UIImage *imgOff = [UIImage imageNamed:@"device_control_shade_off.png"];
+    //UIImage *imgMid = [UIImage imageNamed:@"device_control_shade_mid.png"];
+    //_curtainAnimationView.animationImages = [NSArray arrayWithObjects:imgOn,imgMid,imgOff,nil];
+    //[_curtainAnimationView setAnimationDuration:2.0];
+    //[_curtainAnimationView setAnimationRepeatCount:1];
+    //[_curtainAnimationView startAnimating];
+    
+    [_curtainAnimationView setImage:imgOn];
+    CATransition *animation = [CATransition animation];
+    animation.delegate = self;
+    animation.duration = 1;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    // 设定动画类型
+    // kCATransitionFade 淡化
+    // kCATransitionPush 推挤
+    // kCATransitionReveal 揭开
+    // kCATransitionMoveIn 覆盖
+    // @"cube" 立方体
+    // @"suckEffect" 吸收
+    // @"oglFlip" 翻转
+    // @"rippleEffect" 波纹
+    // @"pageCurl" 翻页
+    // @"pageUnCurl" 反翻页
+    // @"cameraIrisHollowOpen" 镜头开
+    // @"cameraIrisHollowClose" 镜头关
+    animation.type = @"suckEffect";
+    animation.subtype = kCATransitionFromRight;
+
+    [_curtainView addSubview:_curtainAnimationView];
+    [[_curtainView layer] addAnimation:animation forKey:@"animation"];
+
+    [CDeviceData shareDeviceData].curtainStatus = FUNCTION_NAME_OPEN_CURTAIN;
+    [_tableView reloadData];
+}
+
+- (void)didStopCurtain
+{
+
+    [CDeviceData shareDeviceData].curtainStatus = FUNCTION_NAME_STOP_CURTAIN;
+    [_tableView reloadData];
+}
 @end

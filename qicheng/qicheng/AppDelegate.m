@@ -16,6 +16,7 @@
 @synthesize height  = _height;
 @synthesize readData= _readData;
 @synthesize width   = _width;
+@synthesize functionViewController = _functionViewController;
 @synthesize loginViewController = _loginViewController;
 @synthesize mainUIViewController = _mainUIViewController;
 @synthesize recvTailSet = _recvTailSet;
@@ -244,6 +245,63 @@
                 }
             }
             break;
+            case FUNCTION_INDEX_OPEN_CURTAIN:
+            {
+                if ( LENGTH_OPEN_CURTAIN == [msg length] )
+                {
+                    if ( NSOrderedSame == [msg compare:FUNCTION_NAME_OPEN_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_OPEN_CURTAIN length])] )
+                    {
+                        [self didOpenCurtain];
+                    }
+                    else
+                    {
+                        assert(false);
+                    }
+                }
+                else
+                {
+                    assert(false);
+                }
+            }   
+            break; 
+            case FUNCTION_INDEX_STOP_CURTAIN:
+            {
+                if ( LENGTH_STOP_CURTAIN == [msg length] )
+                {
+                    if ( NSOrderedSame == [msg compare:FUNCTION_NAME_STOP_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_STOP_CURTAIN length])] )
+                    {
+                        [self didStopCurtain];
+                    }
+                    else
+                    {
+                        assert(false);
+                    }
+                }
+                else
+                {
+                    assert(false);
+                }
+            }   
+            break; 
+            case FUNCTION_INDEX_CLOSE_CURTAIN:
+            {
+                if ( LENGTH_CLOSE_CURTAIN == [msg length] )
+                {
+                    if ( NSOrderedSame == [msg compare:FUNCTION_NAME_CLOSE_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_CLOSE_CURTAIN length])] )
+                    {
+                        [self didCloseCurtain];
+                    }
+                    else
+                    {
+                        assert(false);
+                    }
+                }
+                else
+                {
+                    assert(false);
+                }
+            }   
+            break; 
         default:
             break;
     }
@@ -505,6 +563,21 @@
     _socket = nil;
 }
 
+- (void)openCurtain
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_OPEN_CURTAIN data:nil];
+}
+
+- (void)stopCurtain
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_STOP_CURTAIN data:nil];
+}
+
+- (void)closeCurtain
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_CLOSE_CURTAIN data:nil];
+}
+
 - (void)queryAllSensorStatus
 {
     [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALL_SENSOR_STATUS data:nil];
@@ -617,4 +690,18 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+- (void)didCloseCurtain
+{
+    [self.functionViewController didCloseCurtain];
+}
+
+- (void)didOpenCurtain
+{
+    [self.functionViewController didOpenCurtain];
+}
+
+- (void)didStopCurtain
+{
+    [self.functionViewController didStopCurtain];
+}
 @end

@@ -63,10 +63,10 @@
     NSLog(@"fun:%s ln:%d type:%d",__FUNCTION__,__LINE__,type);
     if ( 2 == type )
     {
-        if ( ! _functionViewController ) {
-            _functionViewController = [[FunctionViewController alloc] init];
+        if ( ! [AppDelegate shareAppDelegate].functionViewController ) {
+            [AppDelegate shareAppDelegate].functionViewController = [[FunctionViewController alloc] init];
         }
-        [self presentViewController:_functionViewController animated:YES completion:Nil];
+        [self presentViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES completion:Nil];
     }
 }
 

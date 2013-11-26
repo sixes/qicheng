@@ -10,12 +10,15 @@
 
 #import "AsyncSocket/AsyncUdpSocket.h"
 #import "AsyncSocket/AsyncSocket.h"
+#import "FunctionViewController.h"
 #import "LoginViewController.h"
 #import "MainUIViewController.h"
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
     LoginViewController *_loginViewController;
     MainUIViewController *_mainUIViewController;
+    FunctionViewController *_functionViewController;
+
     AsyncSocket *_socket;
     BOOL _bConnected;
     NSTimer * _timer;
@@ -29,6 +32,7 @@
 @property (assign) CGFloat height;
 @property (assign) CGFloat width;
 @property (nonatomic,retain) NSMutableData *readData;
+@property (nonatomic,assign) FunctionViewController *functionViewController;
 @property (nonatomic,assign) LoginViewController *loginViewController;
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
 @property (strong, nonatomic) UIWindow *window;
@@ -39,7 +43,10 @@
 
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;
 
-
+//request
+- (void)openCurtain;
+- (void)stopCurtain;
+- (void)closeCurtain;
 - (void)queryAlarmIsOpen;
 - (void)queryAllAlarmCount;
 - (void)queryAllRelayStatus;
@@ -47,6 +54,10 @@
 - (void)queryAllTimerStatus;
 - (void)querySysDateTime;
 
+//response
+- (void)didCloseCurtain;
+- (void)didOpenCurtain;
+- (void)didStopCurtain;
 
 - (void)prepareSendData:(NSData *)data withTimeout:(NSTimeInterval)timeout tag:(long)tag;
 - (void)sendDataWithFunctionName:(NSString *)name data:(NSData *)aData;
