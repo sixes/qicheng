@@ -20,14 +20,6 @@
 - (id)init
 {
     self = [super init];
-    if ( self ) {
-        _lblLoginIp         = [[UILabel alloc] init];
-        _textFieldIp        = [[UITextField alloc] init];
-        _lblPassword        = [[UILabel alloc] init];
-        _textFieldPassword   = [[UITextField alloc] init];
-        _btnLogin           = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        _bg                 = [[UIImageView alloc] init];
-    }
     return self;
 }
 
@@ -43,20 +35,18 @@
 }
 
 
-- (BOOL) textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    if ( _textFieldIp == textField ) {
-        return YES;
-    }
+//    if ( _textFieldIp == textField )
+//    {
+//        return YES;
+//    }
     return YES;
 }
 
-- (BOOL) textFieldShouldReturn : (UITextField *)textField
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    //if (_textFieldIp == textField) {
-        [textField resignFirstResponder];
-    //}
-    
+    [textField resignFirstResponder];
     return YES;
 }
 
@@ -68,44 +58,50 @@
 
 - (void)loadView
 {
-    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
-    //UIImageView *imgView =  [[UIImageView alloc] initWithImage:imgBg];
-    //[imgView setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
-    
+    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"]; 
     self.view = [[UIImageView alloc] initWithImage:imgBg];
     [self.view setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width,[AppDelegate shareAppDelegate].height )];
     self.view.userInteractionEnabled = YES;
-    //[self.view addSubview:imgView];
-    
-    //[imgView release];
-  //  self.view = [[UIView alloc] init];
     
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTapOutside)];
     [self.view addGestureRecognizer:tgr];
     [tgr release];
     
-    
-//    UIImage *imgBg = [UIImage imageNamed:@"bg3.jpg"];
-//    [_bg setImage:imgBg];
-//    [_bg setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
-//    [self.view addSubview:_bg];
-    
-    NSString *pStr = @"地址 ";
+    _btnLogin           = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    _lblColon           = [[UILabel alloc] init];
+    _lblLoginIp         = [[UILabel alloc] init];
+    _lblPassword        = [[UILabel alloc] init];
+    _textFieldIp        = [[UITextField alloc] init];
+    _textFieldModuleIdx = [[UITextField alloc] init];
+    _textFieldPassword  = [[UITextField alloc] init];
+    _textFieldPort      = [[UITextField alloc] init];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	// Do any additional setup after loading the view.
+
+    static const NSString *pStr = @"地址 ";
     CGSize ipStrSize = [pStr sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
     [_lblLoginIp setText:pStr];
     [_lblLoginIp setTextColor:[UIColor grayColor]];
     [_lblLoginIp setFont:[UIFont boldSystemFontOfSize:20.0]];
     [_lblLoginIp setFrame:CGRectMake(5, [AppDelegate shareAppDelegate].height * 2 / 3, ipStrSize.width, ipStrSize.height)];
     [_lblLoginIp setBackgroundColor:[UIColor clearColor]];
-    //[self.view addSubview:_lblLoginIp];
     
+    NSString *strIp     = DEFAULT_LOGIN_IP;
+    NSString *strLastIp = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_IP];
+    if ( [strLastIp length] > 0 )
+    {
+        strIp = strLastIp;
+    }
     [_textFieldIp setFrame:CGRectMake(15, [AppDelegate shareAppDelegate].height / 3 - 20, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
     [_textFieldIp setTextColor:[UIColor blackColor]];
     [_textFieldIp setBackgroundColor:[UIColor whiteColor]];
-    [_textFieldIp setText:@"192.168.1.254:50000"];
-    [_textFieldIp setPlaceholder:@"192.168.1.254:50000"];
+    [_textFieldIp setText:strIp];
+    [_textFieldIp setPlaceholder:@"域名/IP地址"];
     [_textFieldIp setAdjustsFontSizeToFitWidth:YES];
-    
     [_textFieldIp setLeftViewMode:UITextFieldViewModeAlways];
     [_textFieldIp setLeftView:_lblLoginIp];
     _textFieldIp.borderStyle        = UITextBorderStyleRoundedRect;
@@ -113,32 +109,94 @@
     _textFieldIp.keyboardType       = UIKeyboardAppearanceDefault;
     _textFieldIp.returnKeyType      = UIReturnKeyNext;
     [_textFieldIp setDelegate:self];
-    
     [self.view addSubview:_textFieldIp];
     
-    NSString *pPsw = @"密码 ";
+    static const NSString* strColon = @":";
+    CGSize colonStrSize = [strColon sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
+    [_lblColon setText:strColon];
+    [_lblColon setTextColor:[UIColor blackColor]];
+    [_lblColon setFont:[UIFont boldSystemFontOfSize:20.0]];
+    [_lblColon setFrame:CGRectMake(_textFieldIp.frame.origin.x + _textFieldIp.frame.size.width + 5, [AppDelegate shareAppDelegate].height * 2 / 3, colonStrSize.width, colonStrSize.height)];
+    [_lblColon setBackgroundColor:[UIColor clearColor]];
+    [self.view addSubview:_lblColon];
+
+    NSString *strPort     = DEFAULT_LOGIN_PORT;
+    NSString *strLastPort = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PORT];
+    if ( [strLastPort length] > 0 )
+    {
+        strPort = strLastPort;
+    }
+    CGSize portStrSize = [strPort sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
+    [_textFieldPort setFrame:CGRectMake(_lblColon.frame.origin.x + _lblColon.frame.size.width + 5,_lblColon.frame.origin.y,portStrSize.width,portStrSize.height)];
+    [_textFieldPort setTextColor:[UIColor blackColor]];
+    [_textFieldPort setBackgroundColor:[UIColor whiteColor]];
+    [_textFieldPort setText:strPort];
+    [_textFieldPort setPlaceholder:@"端口"];
+    _textFieldPort.borderStyle           = UITextBorderStyleRoundedRect;
+    _textFieldPort.clearButtonMode       = UITextFieldViewModeWhileEditing;
+    _textFieldPort.keyboardType          = UIKeyboardTypeDecimalPad;
+    _textFieldPort.returnKeyType         = UIReturnKeyDone;
+    [_textFieldPort setSecureTextEntry:YES];
+    [_textFieldPort setDelegate:self];
+    [_textFieldPort setLeftViewMode:UITextFieldViewModeAlways];
+    //[_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
+    [self.view addSubview:_textFieldPort];
+
+    static const NSString *strModuleIdxName = @"模块地址 ";
+    CGSize idxStrSize = [strModuleIdxName sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
+    [_lblModuleIdx setText:strModuleIdxName];
+    [_lblModuleIdx setTextColor:[UIColor grayColor]];
+    [_lblModuleIdx setFont:[UIFont boldSystemFontOfSize:20.0]];
+    [_lblModuleIdx setFrame:CGRectMake(20, 200 + ipStrSize.height, idxStrSize.width, idxStrSize.height)];
+    [_lblModuleIdx setBackgroundColor:[UIColor clearColor]];
+
+    NSString *strIdx     = DEFAULT_LOGIN_MODULEINDEX;
+    NSString *strLastIdx = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    if ( [strLastIdx length] > 0 )
+    {
+        strIdx = strLastIdx;
+    }
+    [_textFieldModuleIdx setFrame:CGRectMake(15,_textFieldIp.frame.origin.y + _textFieldIp.frame.size.height + 5, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
+    [_textFieldModuleIdx setTextColor:[UIColor blackColor]];
+    [_textFieldModuleIdx setBackgroundColor:[UIColor whiteColor]];
+    [_textFieldModuleIdx setText:strIdx];
+    [_textFieldModuleIdx setPlaceholder:DEFAULT_LOGIN_MODULEINDEX];
+    _textFieldModuleIdx.borderStyle           = UITextBorderStyleRoundedRect;
+    _textFieldModuleIdx.clearButtonMode       = UITextFieldViewModeWhileEditing;
+    _textFieldModuleIdx.keyboardType          = UIKeyboardTypeDecimalPad;
+    _textFieldModuleIdx.returnKeyType         = UIReturnKeyDone;
+    [_textFieldModuleIdx setSecureTextEntry:YES];
+    [_textFieldModuleIdx setDelegate:self];
+    [_textFieldModuleIdx setLeftView:_lblModuleIdx];
+    [_textFieldModuleIdx setLeftViewMode:UITextFieldViewModeAlways];
+    //[_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
+    [self.view addSubview:_textFieldModuleIdx];
+
+    static const NSString *pPsw = @"密码 ";
     CGSize pswStrSize = [pPsw sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
     [_lblPassword setText:pPsw];
     [_lblPassword setTextColor:[UIColor grayColor]];
     [_lblPassword setFont:[UIFont boldSystemFontOfSize:20.0]];
     [_lblPassword setFrame:CGRectMake(20, 200 + ipStrSize.height, pswStrSize.width, pswStrSize.height)];
     [_lblPassword setBackgroundColor:[UIColor clearColor]];
-    //[self.view addSubview:_lblPassword];
-    
-    
-    
-    [_textFieldPassword setFrame:CGRectMake(15,_textFieldIp.frame.origin.y + _textFieldIp.frame.size.height + 5, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
+
+    NSString *strPwd     = DEFAULT_LOGIN_PASSWORD;
+    NSString *strLastPwd = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PASSWORD];
+    if ( [strLastPwd length] > 0 )
+    {
+        strPwd = strLastPwd;
+    }
+    [_textFieldPassword setFrame:CGRectMake(15,_textFieldModuleIdx.frame.origin.y + _textFieldModuleIdx.frame.size.height + 5, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
     [_textFieldPassword setTextColor:[UIColor blackColor]];
     [_textFieldPassword setBackgroundColor:[UIColor whiteColor]];
-    //[textFieldPassword setText:@"192.168.1.92:50000"];
-    //[textFieldPassword setPlaceholder:@"192.168.1.92:50000"];
+    [_textFieldPassword setText:strPwd];
+    [_textFieldPassword setPlaceholder:@"默认密码为1234"];
     _textFieldPassword.borderStyle           = UITextBorderStyleRoundedRect;
     _textFieldPassword.clearButtonMode       = UITextFieldViewModeWhileEditing;
     _textFieldPassword.keyboardType          = UIKeyboardTypeDecimalPad;
     _textFieldPassword.returnKeyType         = UIReturnKeyDone;
     [_textFieldPassword setSecureTextEntry:YES];
     [_textFieldPassword setDelegate:self];
-    
     [_textFieldPassword setLeftView:_lblPassword];
     [_textFieldPassword setLeftViewMode:UITextFieldViewModeAlways];
     //[_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
@@ -152,17 +210,10 @@
     [self.view addSubview:_btnLogin];
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	// Do any additional setup after loading the view.
-    
-    
-}
-
 
 - (void)didLoginSuccess
 {
+    [CLoginInfo shareLoginInfo].bLogined = YES;
     if ( ! [AppDelegate shareAppDelegate].mainUIViewController )
     {
         [AppDelegate shareAppDelegate].mainUIViewController = [[MainUIViewController alloc] init];
@@ -180,13 +231,57 @@
 {
     NSLog(@"login tap");
     UIButton *btn = (UIButton*)sender;
-   // _textFieldIp.text
-    
-    //it should save at the time login successes,not here...to be done
-    [[CLoginInfo shareLoginInfo] setLoginPasswod:@"1234"];
-    [[CLoginInfo shareLoginInfo] setLoginModuleIdx:@"01"];
+   if ( [_textFieldIp.text length] < 1 )
+   {
+        UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误信息"
+                                                        message:@"地址不能为空"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        return ;
+   }
+   if ( [_textFieldPassword.text length] < 1 )
+   {
+       UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误信息"
+                                                        message:@"密码不能为空"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        return ;
+   }
+   if ( [_textFieldPort.text length] < 1 )
+   {
+       UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误信息"
+                                                        message:@"端口不能为空"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        return ;
+   }
+   if ( [_textFieldModuleIdx.text length] < 1 )
+    {
+        UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误信息"
+                                                        message:@"模块地址不能为空"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        return ;
+    } 
+
+    [[CLoginInfo shareLoginInfo] setLoginPasswod:_textFieldPassword.text];
+    [[CLoginInfo shareLoginInfo] setLoginModuleIdx:_textFieldModuleIdx.text];
+    [[CLoginInfo shareLoginInfo] setloginIp:_textFieldIp.text];
+    [[CLoginInfo shareLoginInfo] setloginPort:_textFieldPort.text];
     NSLog(@"psw:%@",[CLoginInfo shareLoginInfo].loginPasswod);
-    [[AppDelegate shareAppDelegate] onTapLogin:_textFieldIp.text  psw:_textFieldPassword.text];
+    [[AppDelegate shareAppDelegate] onTapLogin:_textFieldIp.text  psw:_textFieldPassword.text port:_textFieldPort.text moduleIdx:_textFieldModuleIdx.text];
 }
 
 
@@ -194,6 +289,27 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    [_lblLoginIp release];
+    [_lblModuleIdx release];
+    [_textFieldIp release];
+    [_lblPassword release];
+    [_textFieldPassword release];
+    [_btnLogin release];
+    [_lblColon release];
+    [_textFieldPort release];
+    [_textFieldModuleIdx release];
 }
 
+- (void)dealloc
+{
+    [_lblLoginIp release];
+    [_lblModuleIdx release];
+    [_textFieldIp release];
+    [_lblPassword release];
+    [_textFieldPassword release];
+    [_btnLogin release];
+    [_lblColon release];
+    [_textFieldPort release];
+    [_textFieldModuleIdx release];
+}
 @end

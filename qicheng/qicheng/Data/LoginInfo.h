@@ -8,6 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+static const NSString * DEFAULT_LOGIN_IP 					= @"192.168.1.254";
+static const NSString * DEFAULT_LOGIN_MODULEINDEX 			= @"01";
+static const NSString * DEFAULT_LOGIN_PASSWORD 				= @"1234";
+static const NSString * DEFAULT_LOGIN_PORT 					= @"50000";
+
+static const NSString *USER_DEFAULT_KEY_LOGIN_IP 			= @"qicheng_login_ip";
+static const NSString *USER_DEFAULT_KEY_LOGIN_PORT 			= @"qicheng_login_port";
+static const NSString *USER_DEFAULT_KEY_LOGIN_PASSWORD 		= @"qicheng_login_password";
+static const NSString *USER_DEFAULT_KEY_LOGIN_MODULEINDEX	= @"qicheng_login_moduleIndex";
+
 @interface CLoginInfo : NSObject
 {
     BOOL _bLogined;
@@ -18,11 +28,11 @@
     NSString *_strPassword;
     NSString *_strProt;
 }
-
+@property (nonatomic,assign) BOOL bLogined;
 @property (nonatomic,copy) NSString *loginDomain;
 @property (nonatomic,copy) NSString *loginIp;
 @property (nonatomic,copy) NSString *loginModuleIdx;
-@property (nonatomic,copy) NSString *loginPasswod;
+@property (nonatomic,copy) NSString *loginPassword;
 @property (nonatomic,copy) NSString *loginPort;
 
 + (CLoginInfo *)shareLoginInfo;

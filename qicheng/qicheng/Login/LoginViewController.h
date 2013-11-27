@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+
 @interface LoginViewController : UIViewController <UITextFieldDelegate>
 {
     UILabel *_lblLoginIp;
@@ -18,6 +19,11 @@
     UIButton *_btnLogin;
     
     UIImageView *_bg;
+
+    UILabel *_lblColon;
+    UITextField *_textFieldPort;
+    UITextField *_textFieldModuleIdx;
+    UILabel *_lblModuleIdx;
 }
 
 - (void)didLoginSuccess;

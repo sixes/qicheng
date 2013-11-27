@@ -17,10 +17,13 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
 	NSString *_strSysDateTime;
 	NSDate *_sysDateTime;
 
-	NSMutableArray *_relayStatus;
-    NSMutableArray *_relayName;
+
 	NSMutableArray *_alarmCount;
+	NSMutableArray *_sensorName;
 	NSMutableArray *_sensorStatus;
+	NSMutableArray *_relayName;
+	NSMutableArray *_relayStatus;
+	
 	BOOL _bAlarmOpen;
 
 	NSUInteger relay7status;

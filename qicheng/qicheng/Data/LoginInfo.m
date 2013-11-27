@@ -10,10 +10,11 @@
 
 @implementation CLoginInfo
 
+@synthesize bLogined        = _bLogined;
 @synthesize loginDomain     = _strDomain;
 @synthesize loginIp         = _strIp;
 @synthesize loginModuleIdx  = _strModuleIdx;
-@synthesize loginPasswod    = _strPassword;
+@synthesize loginPassword   = _strPassword;
 @synthesize loginPort       = _strProt;
 
 static CLoginInfo * _shareLoginInfo;
@@ -22,8 +23,8 @@ static CLoginInfo * _shareLoginInfo;
 {
     if ( ! _shareLoginInfo )
     {
-        _shareLoginInfo = [[CLoginInfo alloc] initWithModuleIdx:@"01" password:@"1234"];
-        
+        //_shareLoginInfo = [[CLoginInfo alloc] initWithModuleIdx:@"01" password:@"1234"];
+        _shareLoginInfo = [[CLoginInfo alloc] init];
     }
     return _shareLoginInfo;
 }
@@ -34,6 +35,7 @@ static CLoginInfo * _shareLoginInfo;
     {
         _strModuleIdx   = idx;
         _strPassword    = psw;
+        _bLogined       = NO;
     }
     return self
     ;

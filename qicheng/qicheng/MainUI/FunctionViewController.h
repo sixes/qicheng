@@ -23,6 +23,9 @@
     UIImageView *_curtainAnimationView;
     
     BOOL _bFlipped;
+
+    UIButton *_btnBack2Main;
+    UIButton *_btnBack;
 }
 
 @property (nonatomic,assign) BOOL bFilpped;

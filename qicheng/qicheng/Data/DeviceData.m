@@ -11,15 +11,18 @@
 
 @implementation CDeviceData
 
-@synthesize relayName       = _relayName;
-@synthesize relayStatus     = _relayStatus;
 
-@synthesize curtainStatus   = _strCurtainStatus;
 @synthesize loginDomain     = _strDomain;
 @synthesize loginIp         = _strIp;
 @synthesize loginModuleIdx  = _strModuleIdx;
 @synthesize loginPasswod    = _strPassword;
 @synthesize loginPort       = _strProt;
+@synthesize curtainStatus   = _strCurtainStatus;
+@synthesize relayName       = _relayName;
+@synthesize relayStatus     = _relayStatus;
+@synthesize sensorStatus    = _sensorStatus;
+@synthesize sensorName      = _sensorName;
+
 
 static CDeviceData * _shareDeviceData;
 
@@ -36,19 +39,21 @@ static CDeviceData * _shareDeviceData;
 {
     if ( self = [super init] )
     {
-        _relayStatus = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
-        _relayName = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
-        _alarmCount = [[NSMutableArray alloc] initWithCapacity:aCount];
-        _sensorStatus = [[NSMutableArray alloc] initWithCapacity:ssCount];
+        _alarmCount     = [[NSMutableArray alloc] initWithCapacity:aCount];
+        _relayName      = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
+        _relayStatus    = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
+        _sensorName     = [[NSMutableArray alloc] initWithCapacity:ssCount];   
+        _sensorStatus   = [[NSMutableArray alloc] initWithCapacity:ssCount];
         
-        [_relayName addObject:@"继电器1"];
-        [_relayName addObject:@"继电器2"];
-        [_relayName addObject:@"继电器3"];
-        [_relayName addObject:@"继电器4"];
-        [_relayName addObject:@"继电器5"];
-        [_relayName addObject:@"继电器6"];
-        [_relayName addObject:@"继电器7"];
-        [_relayName addObject:@"继电器8"];
+        for (int i = 0; i != relayStatusCount; ++i)
+        {
+            [_relayName addObject:[NSString stringWithFormat:@"继电器%d",i + 1]];
+        }
+       
+        for (int i = 0; i != ssCount; ++i)
+        {
+            [_sensorName addObject:[NSString stringWithFormat:@"传感器%d",i + 1]];
+        }
     }
     return self;
 }

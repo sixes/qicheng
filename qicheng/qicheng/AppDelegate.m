@@ -14,19 +14,20 @@
 
 @implementation AppDelegate
 
-@synthesize height  = _height;
-@synthesize readData= _readData;
-@synthesize width   = _width;
-@synthesize functionViewController = _functionViewController;
-@synthesize loginViewController = _loginViewController;
-@synthesize mainUIViewController = _mainUIViewController;
+@synthesize height      = _height;
+@synthesize readData    = _readData;
+@synthesize width       = _width;
+@synthesize functionViewController  = _functionViewController;
+@synthesize loginViewController     = _loginViewController;
+@synthesize mainUIViewController    = _mainUIViewController;
+@synthesize sceneViewController     = _sceneViewController;
 @synthesize recvTailSet = _recvTailSet;
 +(AppDelegate*) shareAppDelegate
 {
     return [[UIApplication sharedApplication] delegate];
 }
 
--(BOOL)onTapLogin:(NSString *)loginIp psw:(NSString *)loginPassWord
+-(BOOL)onTapLogin:(NSString *)loginIp psw:(NSString *)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx
 {
     NSLog(@"ip:%@%@",loginIp,loginPassWord);
     if ( ! _socket )
@@ -35,36 +36,23 @@
         NSError *error;
        // [_socket connectToHost:@"192.168.1.254" withTimeout:2 onPort:50000 error:&error];
         
-        [_socket connectToHost:@"192.168.1.254" onPort:50000 withTimeout:2 error:&error];
-
-        
-        _bConnected = [_socket isConnected];
-       // NSLog(@"@%",[_socket isConnected]);
+        [_socket connectToHost:loginIp onPort:port withTimeout:2 error:&error];
         [_socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
-        
-       // [_socket writeData:[@"123" dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0 ];
-        
-        
     }
-   //
-   // [_socket writeData:[@"$011234s#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
-   // [_socket writeData:[@"$011234a00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
-   // [_socket writeData:[@"$011234b00#" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:10 tag:0];
     return YES;
 }
 
 - (void)onSocket:(AsyncSocket *)sock willDisconnectWithError:(NSError *)err
 {
     NSLog(@"%s %d",__FUNCTION__,__LINE__);
-    
 }
 
 - (void)didLoginSuccess
 {
-    if ( ! _mainUIViewController )
-    {
-        _mainUIViewController = [[MainUIViewController alloc] init];
-    }
+//    if ( ! _mainUIViewController )
+//    {
+//        _mainUIViewController = [[MainUIViewController alloc] init];
+//    }
     //[self presentModalViewController:_mainUIViewController animate:YES];
 }
 
@@ -73,6 +61,10 @@
     NSLog(@"%s L:%d connected!!!",__FUNCTION__,__LINE__);
     [_socket readDataWithTimeout:-1 tag:0];
     
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginIp forKey:USER_DEFAULT_KEY_LOGIN_IP];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPort forKey:USER_DEFAULT_KEY_LOGIN_PORT];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginModuleIdx forKey:USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPassword forKey:USER_DEFAULT_KEY_LOGIN_PASSWORD];
     //[[AppDelegate shareAppDelegate] didLoginSuccess];
     [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
     [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
@@ -159,10 +151,8 @@
             break;
         case FUNCTION_INDEX_QUERY_ALL_RELAY_STATUS:
             {
-                //01
                 if ( LENGTH_QUERY_ALL_RELAY_STATUS == [msg length] )
                 {
-                
                     NSUInteger data = strtoul([[msg substringWithRange:NSMakeRange(0,LENGTH_QUERY_ALL_RELAY_STATUS)] UTF8String],0,16);
                     NSUInteger relay7status = data & ( 1 << 7 );
                     NSUInteger relay6status = data & ( 1 << 6 );
@@ -253,33 +243,27 @@
                 }
             }
             break;
-            case FUNCTION_INDEX_OPEN_CURTAIN:
+        case FUNCTION_INDEX_OPEN_CURTAIN:
             {
-                
-                    
-                        [self didOpenCurtain];
-                    
+                [self didOpenCurtain];
             }   
             break; 
-            case FUNCTION_INDEX_STOP_CURTAIN:
+        case FUNCTION_INDEX_STOP_CURTAIN:
             {
-            
-                    
-                        [self didStopCurtain];
-                   
+                [self didStopCurtain];
             }   
             break; 
-            case FUNCTION_INDEX_CLOSE_CURTAIN:
+        case FUNCTION_INDEX_CLOSE_CURTAIN:
             {
                 [self didCloseCurtain];
             }   
             break;
-            case FUNCTION_INDEX_OPEN_RELAY:
+        case FUNCTION_INDEX_OPEN_RELAY:
         {
             [self didOpenRelayAtIndex:[msg integerValue]];
         }
             break;
-            case FUNCTION_INDEX_CLOSE_RELAY:
+        case FUNCTION_INDEX_CLOSE_RELAY:
         {
             [self didCloseRelayAtIndex:[msg integerValue]];
         }
@@ -540,9 +524,23 @@
 - (void)onSocketDidDisconnect:(AsyncSocket *)sock
 {
     NSLog(@"%s %d",__FUNCTION__,__LINE__);
+    [CLoginInfo shareLoginInfo].bLogined = NO;
     _bConnected = NO;
     [_socket release];
     _socket = nil;
+
+    UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"连接已断开"
+                                                        message:@"点确定重新登录"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+    if ( ! _loginViewController )
+    {
+        self.loginViewController = [[LoginViewController alloc] init];
+    }
+    [self presentViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES completion:nil];
 }
 
 - (void)openCurtain
@@ -623,6 +621,18 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    float ver = [[[UIDevice currentDevice] systemVersion] floatValue];
+    if ( ver < 4.0 )
+    {
+        UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误信息"
+                                                        message:@"该应用不支持4.0以下版本"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+        exit(0);
+    }
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     _width  = [[UIScreen mainScreen] bounds].size.width;
     _height = [[UIScreen mainScreen] bounds].size.height;
@@ -632,15 +642,29 @@
     
     //[[_loginViewController alloc] init];
     _recvTailSet = [NSCharacterSet characterSetWithCharactersInString:PROTOCOL_RECV_TAIL];
-    _loginViewController = [[LoginViewController alloc] init];
-    if ( [self.window respondsToSelector:@selector(setRootViewController:)] )
+
+    NSString *strIp     = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_IP];
+    NSString *strPort   = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PORT];
+    NSString *strPwd    = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PASSWORD];
+    NSString *strIdx    = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    BOOL bShowLogin     = YES;
+    if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
     {
+        bShowLogin = NO;
+        [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
+    }
+    if ( YES == bShowLogin )
+    {
+        _loginViewController = [[LoginViewController alloc] init];
         [self.window setRootViewController:_loginViewController];
     }
     else
     {
-        [self.window addSubview:_loginViewController.view];
+        _mainUIViewController = [[MainUIViewController alloc] init];
+        [self.window setRootViewController:_mainUIViewController];
+        
     }
+    
     
     return YES;
 }
@@ -665,6 +689,12 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    if ( NO == [_socket isconnected] )
+    {
+        [_socket release];
+        _socket = nil;
+        [self onTapLogin:[CLoginInfo shareLoginInfo].loginIp psw:[CLoginInfo shareLoginInfo].loginPassword port:[CLoginInfo shareLoginInfo].loginPort moduleIdx:[CLoginInfo shareLoginInfo].loginModuleIdx];
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

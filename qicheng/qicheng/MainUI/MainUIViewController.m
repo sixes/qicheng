@@ -60,13 +60,31 @@
 
 - (void)onTapMenuItemWithType:(NSUInteger)type
 {
-    NSLog(@"fun:%s ln:%d type:%d",__FUNCTION__,__LINE__,type);
-    if ( 2 == type )
+    switch( type )
     {
-        if ( ! [AppDelegate shareAppDelegate].functionViewController ) {
-            [AppDelegate shareAppDelegate].functionViewController = [[FunctionViewController alloc] init];
+        case 0:
+        {
+            if ( ! [AppDelegate shareAppDelegate].sceneViewController ) 
+            {
+                [AppDelegate shareAppDelegate].sceneViewController = [[SceneViewController alloc] init];
+            }
+            [self presentViewController:[AppDelegate shareAppDelegate].sceneViewController animated:YES completion:Nil];
         }
-        [self presentViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES completion:Nil];
+        break;
+        case 2:
+        {
+            if ( ! [AppDelegate shareAppDelegate].functionViewController )
+            {
+                [AppDelegate shareAppDelegate].functionViewController = [[FunctionViewController alloc] init];
+            }
+            [self presentViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES completion:Nil];
+        }
+        break;
+        default:
+        {
+            NSLog(@"fun:%s ln:%d type:%d needs to be done",__FUNCTION__,__LINE__,type);
+        }
+        break;
     }
 }
 

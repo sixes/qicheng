@@ -49,6 +49,9 @@
     _carousel.delegate = self;
     _carousel.dataSource = self;
     [self.view addSubview:_carousel];
+
+    _btnBack2Main   = [[UIButton alloc] init];
+    _btnBack        = [[UIButton alloc] init];
 }
 
 - (void)viewDidLoad
@@ -60,6 +63,46 @@
     
     _currentIdx = 0;
     _bFlipped = NO;
+
+    UIImage *back2MainImage = [UIImage imageNamed:@"home.png"];
+    NSString *pressedPath = [[NSBundle mainBundle] pathForResource:@"home_pressed" ofType:@"png"];
+    UIImage *back2MainImagePressed = [UIImage imageWithContentsOfFile:pressedPath];
+    [_btnBack2Main setBackgroundImage:back2MainImage forState:UIControlStateNormal];
+    [_btnBack2Main setBackgroundImage:back2MainImagePressed forState:UIControlStateHighlighted];
+    [_btnBack2Main setFrame:CGRectMake(0,0,back2MainImage.size.width,back2MainImage.size.height)];
+    _btnBack2Main addTarget:self action:@selector(onTapBack2Main) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_btnBack2Main];
+
+    NSString *backNormal = [[NSBundle mainBundle] pathForResource:@"general_back_normal" ofType:@"png"];
+    UIImage *backImage = [UIImage imageWithContentsOfFile:backNormal];
+    NSString *backPressed = [[NSBundle mainBundle] pathForResource:@"general_back_pressed" ofType:@"png"];
+    UIImage *backPressedImg = [UIImage imageWithContentsOfFile:backPressed];
+    [_btnBack setBackgroundImage:backImage forState:UIControlStateNormal];
+    [_btnBack setBackgroundImage:backPressedImg forState:UIControlStateHighlighted];
+    [_btnBack setFrame:CGRectMake(0,0,backImage.size.width,backImage.size.height)];
+    _btnBack addTarget:self action:@selector(onTapBack) forControlEvents:UIControlEventTouchUpInside];
+    [_btnBack setHidden:YES];
+    [self.view addSubview:_btnBack];
+}
+
+- (void)onTapBack2Main
+{
+    [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:NO completion:nil]; 
+}
+
+- (void)onTapBack
+{
+    if ( YES == _bFlipped )
+    {
+        _bFlipped = NO;
+        [_btnBack2Main setHidden:NO];
+        [_btnBack setHidden:YES];
+        if ( _curtainView )
+        {
+            [_curtainView removeFromSuperview];
+            [_tableView setHidden:NO];
+        }
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -72,11 +115,18 @@
     switch ( _currentIdx )
     {
         case 0:
+        {
             return [self.curtainArray count];
-            break;
+        }
+        break;
         case 1:
         {
             return [[CDeviceData shareDeviceData].relayName count];
+        }
+        break;
+        case 2:
+        {
+            return [[CDeviceData shareDeviceData].sensorName count];    
         }
         break;
         default:
@@ -99,18 +149,6 @@
         [sw addTarget:self action:@selector(updateSwitchAtIndexPath:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = sw;
         [sw release];
-        
-        switch ( _currentIdx )
-        {
-            case 1:
-            {
-                
-            }
-                break;
-            case 0:
-            default:
-                break;
-        }
     }
     switch ( _currentIdx )
     {
@@ -126,27 +164,42 @@
         break;
         case 1:
         {
-            [cell.accessoryView setHidden:NO];
-            cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
-            //[[CDeviceData shareDeviceData] getCurtainStatus];
             
+            cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
+            UISwitch *sw = (UISwitch*)cell.accessoryView;
+            [cell.accessoryView setHidden:NO];
             NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].relayStatus objectAtIndexedSubscript:indexPath.row];
             if ( [num integerValue] > 0 )
             {
                 cell.detailTextLabel.text = @"开启";
-                UISwitch *sw = (UISwitch*)cell.accessoryView;
                 sw.on = YES;
             }
             else
             {
                 cell.detailTextLabel.text = @"关闭";
-                UISwitch *sw = (UISwitch*)cell.accessoryView;
                 sw.on = NO;
             }
             NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
             UIImage *theImage = [UIImage imageWithContentsOfFile:path];
             cell.imageView.image = theImage;
-            
+        }
+        break;
+        case 2:
+        {
+            cell.textLabel.text = [[CDeviceData shareDeviceData].sensorName objectAtIndex:indexPath.row];
+            [cell.accessoryView setHidden:YES];
+            NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].sensorStatus objectAtIndexedSubscript:indexPath.row];
+            if ( [num integerValue] > 0 )
+            {
+                cell.detailTextLabel.text = @"正常状态";
+            }
+            else
+            {
+                cell.detailTextLabel.text = @"报警状态";
+            }
+            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+            cell.imageView.image = theImage;
         }
         break;
         default:
@@ -166,7 +219,6 @@
     {
         [[AppDelegate shareAppDelegate] closeRelayAtIndex:(NSUInteger)sw.tag];
     }
-    //NSLog(@"on tap sw index:%d",sw.tag);
 }
 
 - (void)loadCurtainView
@@ -209,8 +261,6 @@
     [btnClose addTarget:self action:@selector(onTapCloseCurtain) forControlEvents:UIControlEventTouchUpInside];
     [_curtainView addSubview:btnClose];
     [btnClose release];
-    
-    
 }
 
 - (void)onTapStopCurtain
@@ -225,7 +275,6 @@
 
 - (void)onTapOpenCurtain
 {
-    //NSLog(@"ontapButn");
     [[AppDelegate shareAppDelegate] openCurtain];
 }
 
@@ -246,6 +295,9 @@
                     }
                     [_tableView setHidden:YES];
                     [self.view addSubview:_curtainView];
+
+                    [_btnBack2Main setHidden:YES];
+                    [_btnBack setHidden:NO];
                 }
                 break;
                     
@@ -287,11 +339,7 @@
     }
     if ( YES == _bFlipped )
     {
-        if ( _curtainView )
-        {
-            [_curtainView removeFromSuperview];
-            [_tableView setHidden:NO];
-        }
+        [self onTapBack];
     }
     [_tableView reloadData];
 }
@@ -355,6 +403,19 @@
             if ( itemView )
             {
                 [itemView setImage:img menuName:@"继电器"];
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+        case 1:
+        {
+            UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
+            MenuItemView *itemView = (MenuItemView*)view;
+            if ( itemView )
+            {
+                [itemView setImage:img menuName:@"传感器"];
             }
             else
             {
@@ -431,7 +492,6 @@
 
 - (void)didStopCurtain
 {
-
     [CDeviceData shareDeviceData].curtainStatus = FUNCTION_NAME_STOP_CURTAIN;
     [_tableView reloadData];
 }

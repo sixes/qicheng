@@ -13,11 +13,14 @@
 #import "FunctionViewController.h"
 #import "LoginViewController.h"
 #import "MainUIViewController.h"
+#import "SceneViewController.h"
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
+    FunctionViewController *_functionViewController;
     LoginViewController *_loginViewController;
     MainUIViewController *_mainUIViewController;
-    FunctionViewController *_functionViewController;
+    SceneViewController *_sceneViewController;
 
     AsyncSocket *_socket;
     BOOL _bConnected;
@@ -35,13 +38,14 @@
 @property (nonatomic,assign) FunctionViewController *functionViewController;
 @property (nonatomic,assign) LoginViewController *loginViewController;
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
+@property (nonatomic,assign) SceneViewController *sceneViewController;
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic,assign) NSCharacterSet *recvTailSet;
 
 - (void)didLoginSuccess;
 + (AppDelegate*) shareAppDelegate;
 
-- (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord;
+- (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx;
 
 //request
 - (void)openCurtain;
