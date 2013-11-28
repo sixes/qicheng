@@ -41,19 +41,19 @@
     self.view.userInteractionEnabled = YES;
     
     UIImage *img1 = [UIImage imageNamed:@"scene.png"];
-    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 20, 130, 130) image:img1 menuName:@"场景" menuItemType:0 dispatchEvent:YES];
+    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 40, 130, 130) image:img1 menuName:@"场景" menuItemType:0 dispatchEvent:YES];
     [self.view addSubview:item1];
     [item1 release];
     
     UIImage *img2 = [UIImage imageNamed:@"main_home_room.png"];
 //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
-    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 20, 130, 130) image:img2 menuName:@"区域" menuItemType:1 dispatchEvent:YES];
+    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 40, 130, 130) image:img2 menuName:@"区域" menuItemType:1 dispatchEvent:YES];
     [self.view addSubview:item2];
     [item2 release];
     
     UIImage *img3 = [UIImage imageNamed:@"main_home_devices.png"];
     //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
-    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 150, 130, 130) image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:YES];
+    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 170, 130, 130) image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:YES];
     [self.view addSubview:item3];
     [item3 release];
 }

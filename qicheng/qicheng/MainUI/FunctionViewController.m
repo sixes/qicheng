@@ -173,8 +173,8 @@
                 NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
                 UIImage *theImage = [UIImage imageWithContentsOfFile:path];
                 cell.imageView.image = theImage;
-                [cell.accessoryView setHidden:YES];
             }
+            [cell.accessoryView setHidden:YES];
         }
         break;
         case 1:
@@ -199,7 +199,10 @@
                 UIImage *theImage = [UIImage imageWithContentsOfFile:path];
                 cell.imageView.image = theImage;
             }
-            
+            else
+            {
+                [cell.accessoryView setHidden:YES];
+            }
         }
         break;
         case 2:

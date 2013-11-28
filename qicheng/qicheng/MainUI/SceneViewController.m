@@ -43,27 +43,27 @@
     [self.view addSubview:_btnBack2Main];
 
     UIImage *img1 = [UIImage imageNamed:@"scene_gallery_2.png"];
-    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 20, 130, 130) image:img1 menuName:@"Home" menuItemType:0 dispatchEvent:NO];
+    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 40, 130, 130) image:img1 menuName:@"Home" menuItemType:0 dispatchEvent:NO];
     [self.view addSubview:item1];
     [item1 release];
     
     UIImage *img2 = [UIImage imageNamed:@"scene_gallery_3.png"];
-    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 20, 130, 130) image:img2 menuName:@"Sleep" menuItemType:1 dispatchEvent:NO];
+    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 40, 130, 130) image:img2 menuName:@"Sleep" menuItemType:1 dispatchEvent:NO];
     [self.view addSubview:item2];
     [item2 release];
     
     UIImage *img3 = [UIImage imageNamed:@"scene_gallery_4.png"];
-    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 150, 130, 130) image:img3 menuName:@"Movie" menuItemType:2 dispatchEvent:NO];
+    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 170, 130, 130) image:img3 menuName:@"Movie" menuItemType:2 dispatchEvent:NO];
     [self.view addSubview:item3];
     [item3 release];
 
     UIImage *img4 = [UIImage imageNamed:@"scene_gallery_6.png"];
-    MenuItemView *item4 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 20, 130, 130) image:img4 menuName:@"Movie" menuItemType:3 dispatchEvent:NO];
+    MenuItemView *item4 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 40, 130, 130) image:img4 menuName:@"Movie" menuItemType:3 dispatchEvent:NO];
     [self.view addSubview:item4];
     [item4 release];
 
     UIImage *img5 = [UIImage imageNamed:@"scene_gallery_1.png"];
-    MenuItemView *item5 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 280, 130, 130) image:img5 menuName:@"Leave" menuItemType:4 dispatchEvent:NO];
+    MenuItemView *item5 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 300, 130, 130) image:img5 menuName:@"Leave" menuItemType:4 dispatchEvent:NO];
     [self.view addSubview:item5];
     [item5 release];
 }
