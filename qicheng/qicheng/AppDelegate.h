@@ -30,6 +30,8 @@
     CGFloat _height;
 
     NSCharacterSet * _recvTailSet;
+    
+    UINavigationController *_navController;
 }
 
 @property (assign) CGFloat height;
@@ -38,7 +40,9 @@
 @property (nonatomic,assign) FunctionViewController *functionViewController;
 @property (nonatomic,assign) LoginViewController *loginViewController;
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
+@property (nonatomic,assign) UINavigationController *navController;
 @property (nonatomic,assign) SceneViewController *sceneViewController;
+
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic,assign) NSCharacterSet *recvTailSet;
 

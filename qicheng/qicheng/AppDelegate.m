@@ -20,6 +20,7 @@
 @synthesize functionViewController  = _functionViewController;
 @synthesize loginViewController     = _loginViewController;
 @synthesize mainUIViewController    = _mainUIViewController;
+@synthesize navController           = _navController;
 @synthesize sceneViewController     = _sceneViewController;
 @synthesize recvTailSet = _recvTailSet;
 +(AppDelegate*) shareAppDelegate
@@ -29,14 +30,14 @@
 
 -(BOOL)onTapLogin:(NSString *)loginIp psw:(NSString *)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx
 {
-    NSLog(@"ip:%@%@",loginIp,loginPassWord);
+    NSLog(@"ip:%@ pwd:%@",loginIp,loginPassWord);
     if ( ! _socket )
     {
         _socket = [[AsyncSocket alloc] initWithDelegate:self];
         NSError *error;
        // [_socket connectToHost:@"192.168.1.254" withTimeout:2 onPort:50000 error:&error];
         
-        [_socket connectToHost:loginIp onPort:port withTimeout:2 error:&error];
+        [_socket connectToHost:loginIp onPort:[port intValue] withTimeout:2 error:&error];
         [_socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     }
     return YES;
@@ -61,10 +62,13 @@
     NSLog(@"%s L:%d connected!!!",__FUNCTION__,__LINE__);
     [_socket readDataWithTimeout:-1 tag:0];
     
-    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginIp forKey:USER_DEFAULT_KEY_LOGIN_IP];
-    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPort forKey:USER_DEFAULT_KEY_LOGIN_PORT];
-    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginModuleIdx forKey:USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
-    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPassword forKey:USER_DEFAULT_KEY_LOGIN_PASSWORD];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginIp forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_IP];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPort forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PORT];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginModuleIdx forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPassword forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PASSWORD];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:(id)@"thisone" forKey:@"test1"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     //[[AppDelegate shareAppDelegate] didLoginSuccess];
     [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
     [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
@@ -534,13 +538,15 @@
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
-    [alert show];
+   // [alert show];
     [alert release];
-    if ( ! _loginViewController )
+    if ( ! [AppDelegate shareAppDelegate].loginViewController )
     {
-        self.loginViewController = [[LoginViewController alloc] init];
+        [AppDelegate shareAppDelegate].loginViewController = [[LoginViewController alloc] init];
     }
-    [self presentViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES completion:nil];
+    //[[AppDelegate shareAppDelegate].mainUIViewController presentViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES completion:nil];
+    //[_navController pushViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES];
+    NSLog(@"bingoooooooo");
 }
 
 - (void)openCurtain
@@ -597,12 +603,12 @@
     }
     
     NSUInteger dataLength   = [aData length];
-    NSUInteger totalLength  = [PROTOCOL_SEND_HEAD length] + LENGTH_MODULE_ADDR + [[CLoginInfo shareLoginInfo].loginPasswod length]
+    NSUInteger totalLength  = [PROTOCOL_SEND_HEAD length] + LENGTH_MODULE_ADDR + [[CLoginInfo shareLoginInfo].loginPassword length]
                             + LENGTH_FUNCTION_NAME + dataLength + [RPOTOCOL_SEND_TAIL length];
     NSMutableData *prepareData = [NSMutableData dataWithCapacity:totalLength];
     [prepareData appendData:[PROTOCOL_SEND_HEAD dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:[[CLoginInfo shareLoginInfo].loginModuleIdx dataUsingEncoding:NSASCIIStringEncoding]];
-    [prepareData appendData:[[CLoginInfo shareLoginInfo].loginPasswod dataUsingEncoding:NSASCIIStringEncoding]];
+    [prepareData appendData:[[CLoginInfo shareLoginInfo].loginPassword dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:[name dataUsingEncoding:NSASCIIStringEncoding]];
     [prepareData appendData:aData];
     [prepareData appendData:[RPOTOCOL_SEND_TAIL dataUsingEncoding:NSASCIIStringEncoding]];
@@ -643,28 +649,35 @@
     //[[_loginViewController alloc] init];
     _recvTailSet = [NSCharacterSet characterSetWithCharactersInString:PROTOCOL_RECV_TAIL];
 
-    NSString *strIp     = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_IP];
-    NSString *strPort   = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PORT];
-    NSString *strPwd    = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PASSWORD];
-    NSString *strIdx    = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    NSString *strIp     = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_IP];
+    NSString *strPort   = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PORT];
+    NSString *strPwd    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PASSWORD];
+    NSString *strIdx    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    
+    const static NSString* strTest = @"test1";
+    
+    NSString *last = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:strTest];
+    
+    
     BOOL bShowLogin     = YES;
     if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
     {
         bShowLogin = NO;
         [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
     }
+    _mainUIViewController = [[MainUIViewController alloc] init];
+    //[self.window setRootViewController:_mainUIViewController];
+    _navController = [[UINavigationController alloc] init];
+    [_navController setToolbarHidden:YES];
+    [_navController setNavigationBarHidden:YES];
+    [self.window setRootViewController:_navController];
+    [_navController pushViewController:_mainUIViewController animated:NO];
     if ( YES == bShowLogin )
     {
         _loginViewController = [[LoginViewController alloc] init];
-        [self.window setRootViewController:_loginViewController];
+       // [_mainUIViewController presentViewController:_loginViewController animated:YES completion:nil];
+        [_navController pushViewController:_loginViewController animated:YES]; 
     }
-    else
-    {
-        _mainUIViewController = [[MainUIViewController alloc] init];
-        [self.window setRootViewController:_mainUIViewController];
-        
-    }
-    
     
     return YES;
 }
@@ -689,7 +702,7 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    if ( NO == [_socket isconnected] )
+    if ( NO == [_socket isConnected] )
     {
         [_socket release];
         _socket = nil;

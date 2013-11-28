@@ -68,7 +68,8 @@
             {
                 [AppDelegate shareAppDelegate].sceneViewController = [[SceneViewController alloc] init];
             }
-            [self presentViewController:[AppDelegate shareAppDelegate].sceneViewController animated:YES completion:Nil];
+           // [self presentViewController:[AppDelegate shareAppDelegate].sceneViewController animated:YES completion:Nil];
+            [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].sceneViewController animated:YES];
         }
         break;
         case 2:
@@ -77,7 +78,8 @@
             {
                 [AppDelegate shareAppDelegate].functionViewController = [[FunctionViewController alloc] init];
             }
-            [self presentViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES completion:Nil];
+            //[self presentViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES completion:Nil];
+            [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES];
         }
         break;
         default:

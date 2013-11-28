@@ -218,7 +218,9 @@
     {
         [AppDelegate shareAppDelegate].mainUIViewController = [[MainUIViewController alloc] init];
     }
-    [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
+   // [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
+    
+    [[AppDelegate shareAppDelegate].navController popToRootViewControllerAnimated:YES];
 }
 
 - (void)onPassWordDone:(id)sender
@@ -276,11 +278,11 @@
         return ;
     } 
 
-    [[CLoginInfo shareLoginInfo] setLoginPasswod:_textFieldPassword.text];
+    [[CLoginInfo shareLoginInfo] setLoginPassword:_textFieldPassword.text];
     [[CLoginInfo shareLoginInfo] setLoginModuleIdx:_textFieldModuleIdx.text];
-    [[CLoginInfo shareLoginInfo] setloginIp:_textFieldIp.text];
-    [[CLoginInfo shareLoginInfo] setloginPort:_textFieldPort.text];
-    NSLog(@"psw:%@",[CLoginInfo shareLoginInfo].loginPasswod);
+    [[CLoginInfo shareLoginInfo] setLoginIp:_textFieldIp.text];
+    [[CLoginInfo shareLoginInfo] setLoginPort:_textFieldPort.text];
+    NSLog(@"psw:%@",[CLoginInfo shareLoginInfo].loginPassword);
     [[AppDelegate shareAppDelegate] onTapLogin:_textFieldIp.text  psw:_textFieldPassword.text port:_textFieldPort.text moduleIdx:_textFieldModuleIdx.text];
 }
 

@@ -70,7 +70,7 @@
     [_btnBack2Main setBackgroundImage:back2MainImage forState:UIControlStateNormal];
     [_btnBack2Main setBackgroundImage:back2MainImagePressed forState:UIControlStateHighlighted];
     [_btnBack2Main setFrame:CGRectMake(0,0,back2MainImage.size.width,back2MainImage.size.height)];
-    _btnBack2Main addTarget:self action:@selector(onTapBack2Main) forControlEvents:UIControlEventTouchUpInside];
+    [_btnBack2Main addTarget:self action:@selector(onTapBack2Main) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_btnBack2Main];
 
     NSString *backNormal = [[NSBundle mainBundle] pathForResource:@"general_back_normal" ofType:@"png"];
@@ -80,14 +80,26 @@
     [_btnBack setBackgroundImage:backImage forState:UIControlStateNormal];
     [_btnBack setBackgroundImage:backPressedImg forState:UIControlStateHighlighted];
     [_btnBack setFrame:CGRectMake(0,0,backImage.size.width,backImage.size.height)];
-    _btnBack addTarget:self action:@selector(onTapBack) forControlEvents:UIControlEventTouchUpInside];
+    [_btnBack addTarget:self action:@selector(onTapBack) forControlEvents:UIControlEventTouchUpInside];
     [_btnBack setHidden:YES];
     [self.view addSubview:_btnBack];
 }
 
 - (void)onTapBack2Main
 {
-    [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:NO completion:nil]; 
+    if ( self.bFilpped == NO )
+    {
+        NSLog(@"yes");
+    }
+    
+    if ( ! [AppDelegate shareAppDelegate].mainUIViewController )
+    {
+        [AppDelegate shareAppDelegate].mainUIViewController = [[MainUIViewController alloc] init];
+    }
+    
+    //[self dismissViewControllerAnimated:YES completion:Nil];
+   // [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
+    [[AppDelegate shareAppDelegate].navController popToRootViewControllerAnimated:YES];
 }
 
 - (void)onTapBack
@@ -154,52 +166,62 @@
     {
         case 0:
         {
-            cell.textLabel.text =  [self.curtainArray objectAtIndex:indexPath.row];
-            cell.detailTextLabel.text = [[CDeviceData shareDeviceData] getCurtainStatus];
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
-            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
-            cell.imageView.image = theImage;
-            [cell.accessoryView setHidden:YES];
+            if ( indexPath.row < [self.curtainArray count] )
+            {
+                cell.textLabel.text =  [self.curtainArray objectAtIndex:indexPath.row];
+                cell.detailTextLabel.text = [[CDeviceData shareDeviceData] getCurtainStatus];
+                NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+                UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+                cell.imageView.image = theImage;
+                [cell.accessoryView setHidden:YES];
+            }
         }
         break;
         case 1:
         {
+            if ( indexPath.row < [[CDeviceData shareDeviceData].relayStatus count] )
+            {
+                cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
+                UISwitch *sw = (UISwitch*)cell.accessoryView;
+                [cell.accessoryView setHidden:NO];
+                NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].relayStatus objectAtIndexedSubscript:indexPath.row];
+                if ( [num integerValue] > 0 )
+                {
+                    cell.detailTextLabel.text = @"开启";
+                    sw.on = YES;
+                }
+                else
+                {
+                    cell.detailTextLabel.text = @"关闭";
+                    sw.on = NO;
+                }
+                NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+                UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+                cell.imageView.image = theImage;
+            }
             
-            cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
-            UISwitch *sw = (UISwitch*)cell.accessoryView;
-            [cell.accessoryView setHidden:NO];
-            NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].relayStatus objectAtIndexedSubscript:indexPath.row];
-            if ( [num integerValue] > 0 )
-            {
-                cell.detailTextLabel.text = @"开启";
-                sw.on = YES;
-            }
-            else
-            {
-                cell.detailTextLabel.text = @"关闭";
-                sw.on = NO;
-            }
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
-            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
-            cell.imageView.image = theImage;
         }
         break;
         case 2:
         {
-            cell.textLabel.text = [[CDeviceData shareDeviceData].sensorName objectAtIndex:indexPath.row];
-            [cell.accessoryView setHidden:YES];
-            NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].sensorStatus objectAtIndexedSubscript:indexPath.row];
-            if ( [num integerValue] > 0 )
+            if ( indexPath.row < [[CDeviceData shareDeviceData].sensorStatus count] )
             {
-                cell.detailTextLabel.text = @"正常状态";
+                cell.textLabel.text = [[CDeviceData shareDeviceData].sensorName objectAtIndex:indexPath.row];
+                [cell.accessoryView setHidden:YES];
+                NSNumber *num = (NSNumber*)[[CDeviceData shareDeviceData].sensorStatus objectAtIndexedSubscript:indexPath.row];
+                if ( [num integerValue] > 0 )
+                {
+                    cell.detailTextLabel.text = @"正常状态";
+                }
+                else
+                {
+                    cell.detailTextLabel.text = @"报警状态";
+                }
+                NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+                UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+                cell.imageView.image = theImage;
             }
-            else
-            {
-                cell.detailTextLabel.text = @"报警状态";
-            }
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
-            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
-            cell.imageView.image = theImage;
+            
         }
         break;
         default:
@@ -409,7 +431,7 @@
                 assert(false);
             }
         }
-        case 1:
+        case 2:
         {
             UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
             MenuItemView *itemView = (MenuItemView*)view;

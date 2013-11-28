@@ -38,6 +38,7 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
 @property (nonatomic,retain) NSMutableArray *relayName;
 @property (nonatomic,retain) NSMutableArray *relayStatus;
 @property (nonatomic,retain) NSMutableArray *alarmCount;
+@property (nonatomic,retain) NSMutableArray *sensorName;
 @property (nonatomic,retain) NSMutableArray *sensorStatus;
 @property (nonatomic,copy) NSString *curtainStatus;
 @property (nonatomic,copy) NSString *originalSysDateTime;
