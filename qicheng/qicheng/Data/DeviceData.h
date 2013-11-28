@@ -25,6 +25,8 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
 	NSMutableArray *_relayStatus;
 	
 	BOOL _bAlarmOpen;
+    NSNumber *_outsideTemp;
+    NSNumber *_insideTemp;
 
 	NSUInteger relay7status;
     NSString *_strCurtainStatus;
@@ -35,6 +37,10 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
     NSString *_strPassword;
     NSString *_strProt;
 }
+
+@property (nonatomic,assign) BOOL bAlarmOpen;
+@property (nonatomic,assign) NSNumber *insideTemp;
+@property (nonatomic,assign) NSNumber *outsideTemp;
 @property (nonatomic,retain) NSMutableArray *relayName;
 @property (nonatomic,retain) NSMutableArray *relayStatus;
 @property (nonatomic,retain) NSMutableArray *alarmCount;

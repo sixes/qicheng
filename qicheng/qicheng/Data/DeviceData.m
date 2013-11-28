@@ -12,12 +12,15 @@
 @implementation CDeviceData
 
 
+@synthesize bAlarmOpen      = _bAlarmOpen;
+@synthesize curtainStatus   = _strCurtainStatus;
+@synthesize insideTemp      = _insideTemp;
 @synthesize loginDomain     = _strDomain;
 @synthesize loginIp         = _strIp;
 @synthesize loginModuleIdx  = _strModuleIdx;
 @synthesize loginPasswod    = _strPassword;
 @synthesize loginPort       = _strProt;
-@synthesize curtainStatus   = _strCurtainStatus;
+@synthesize outsideTemp     = _outsideTemp;
 @synthesize relayName       = _relayName;
 @synthesize relayStatus     = _relayStatus;
 @synthesize sensorStatus    = _sensorStatus;
@@ -31,6 +34,7 @@ static CDeviceData * _shareDeviceData;
     if ( ! _shareDeviceData )
     {
         _shareDeviceData = [[CDeviceData alloc] initWithRelayStatusCount:COUNT_RELAY alarmCount:COUNT_ALARM sensorStatusCount:COUNT_SENSOR];
+        
     }
     return _shareDeviceData;
 }
@@ -44,7 +48,8 @@ static CDeviceData * _shareDeviceData;
         _relayStatus    = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
         _sensorName     = [[NSMutableArray alloc] initWithCapacity:ssCount];   
         _sensorStatus   = [[NSMutableArray alloc] initWithCapacity:ssCount];
-        
+        _outsideTemp    = [NSNumber numberWithInt:999];
+        _insideTemp     = [NSNumber numberWithInt:999];
         for (int i = 0; i != relayStatusCount; ++i)
         {
             [_relayName addObject:[NSString stringWithFormat:@"继电器%d",i + 1]];
@@ -62,15 +67,15 @@ static CDeviceData * _shareDeviceData;
 {
     if ( NSOrderedSame == [status compare:FUNCTION_NAME_OPEN_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_OPEN_CURTAIN length])] )
     {
-        _strCurtainStatusName = CURTAIN_OPEN_NAME;
+        _strCurtainStatusName = (NSString*)CURTAIN_OPEN_NAME;
     }
     else if ( NSOrderedSame == [status compare:FUNCTION_NAME_CLOSE_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_CLOSE_CURTAIN length])] )
     {
-        _strCurtainStatusName = CURTAIN_CLOSE_NAME;
+        _strCurtainStatusName = (NSString*)CURTAIN_CLOSE_NAME;
     }
     else if ( NSOrderedSame == [status compare:FUNCTION_NAME_STOP_CURTAIN options:NSLiteralSearch range:NSMakeRange(0, [FUNCTION_NAME_STOP_CURTAIN length])] )
     {
-        _strCurtainStatusName = CURTAIN_STOP_NAME;
+        _strCurtainStatusName = (NSString*)CURTAIN_STOP_NAME;
     }
     else
     {

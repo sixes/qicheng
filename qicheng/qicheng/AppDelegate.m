@@ -30,9 +30,14 @@
 
 -(BOOL)onTapLogin:(NSString *)loginIp psw:(NSString *)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx
 {
-    NSLog(@"ip:%@ pwd:%@",loginIp,loginPassWord);
+    NSLog(@"ip:%@ pwd:%@ f:%s l:%d",loginIp,loginPassWord,__FUNCTION__,__LINE__);
     if ( ! _socket )
     {
+        [[CLoginInfo shareLoginInfo] setLoginPassword:loginPassWord];
+        [[CLoginInfo shareLoginInfo] setLoginModuleIdx:idx];
+        [[CLoginInfo shareLoginInfo] setLoginIp:loginIp];
+        [[CLoginInfo shareLoginInfo] setLoginPort:port];
+        
         _socket = [[AsyncSocket alloc] initWithDelegate:self];
         NSError *error;
        // [_socket connectToHost:@"192.168.1.254" withTimeout:2 onPort:50000 error:&error];
@@ -60,6 +65,10 @@
 - (void)onSocket:(AsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
 {
     NSLog(@"%s L:%d connected!!!",__FUNCTION__,__LINE__);
+    if ( NO == [_socket isConnected] )
+    {
+        //assert(false);
+    }
     [_socket readDataWithTimeout:-1 tag:0];
     
     [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginIp forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_IP];
@@ -71,18 +80,23 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     //[[AppDelegate shareAppDelegate] didLoginSuccess];
     [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
-    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:2.2 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
+    
+    //这里登录后的6个必查状态的发送请求，现在间隔必须在1秒多以上，不然设备不会返回数据
+    //用tcp & upd debug查看过数据，发送的6个数据都可以正确地接收到。
+    [NSTimer scheduledTimerWithTimeInterval:0.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
+    [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:3.4 target:self selector:@selector(querySysDateTime) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:4.6 target:self selector:@selector(queryAllRelayStatus) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:5.8 target:self selector:@selector(queryAllTimerStatus) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:6.0 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
+    
+    [_navController pushViewController:_mainUIViewController animated:NO];
 };
 
 - (void)onSocket:(AsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
     NSLog(@"%s %d",__FUNCTION__,__LINE__);
-   // [_socket readDataWithTimeout:-1 tag:0];
+    [_socket readDataWithTimeout:-1 tag:0];
 }
 
 - (void)didReceiveData:(NSMutableData *)data
@@ -193,7 +207,10 @@
                     NSUInteger alarm2count = strtoul([[msg substringWithRange:NSMakeRange(8,4)] UTF8String],0,16);
                     NSUInteger alarm3count = strtoul([[msg substringWithRange:NSMakeRange(12,4)] UTF8String],0,16);
 
-                
+                    [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm0count] atIndexedSubscript:0];
+                    [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm1count] atIndexedSubscript:1];
+                    [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm2count] atIndexedSubscript:2];
+                    [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm3count] atIndexedSubscript:3];
                 }
                 else
                 {
@@ -203,6 +220,7 @@
             break;
         case FUNCTION_INDEX_QUERY_ALARM_IS_OPEN:
             {
+                //设备故障,未测试
                 if ( LENGTH_QUERY_ALARM_IS_OPEN == [msg length] )
                 {
                     
@@ -210,12 +228,14 @@
                     if ( value > 0 )
                     {
                         NSLog(@"alarm is opened");
+                        [CDeviceData shareDeviceData].bAlarmOpen = YES;
                     }                    
                     else
                     {
-                        NSLog(@"alarm is closed"); 
+                        NSLog(@"alarm is closed");
+                        [CDeviceData shareDeviceData].bAlarmOpen = NO;
                     }
-                
+                    
                 }
                 else
                 {
@@ -239,7 +259,11 @@
                     NSUInteger sensor1status = value & ( 1 << 2 );
                     NSUInteger sensor2status = value & ( 1 << 3 );
                     NSUInteger sensor3status = value & ( 1 << 4 );
-
+                    
+                    [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor0status] atIndexedSubscript:0];
+                    [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor1status] atIndexedSubscript:1];
+                    [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor2status] atIndexedSubscript:2];
+                    [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor3status] atIndexedSubscript:3];
                 }
                 else
                 {
@@ -270,6 +294,34 @@
         case FUNCTION_INDEX_CLOSE_RELAY:
         {
             [self didCloseRelayAtIndex:[msg integerValue]];
+        }
+            break;
+        case FUNCTION_INDEX_QUERY_TEMPERATURE:
+        {
+            if ( LENGTH_QUERY_TEMPERATURE == [msg length] )
+            {
+                int factor = 1;
+                if ( NSOrderedSame == [msg compare:@"-" options:NSLiteralSearch range:NSMakeRange(0, [@"-" length])] )
+                {
+                    factor = -1;
+                }
+                NSUInteger value = strtoul([[msg substringWithRange:NSMakeRange(1,2)] UTF8String],0,16);
+                [CDeviceData shareDeviceData].insideTemp = [NSNumber numberWithInt:factor * value];
+                
+                factor = 1;
+                if ( NSOrderedSame == [msg compare:@"-" options:NSLiteralSearch range:NSMakeRange(3, [@"-" length])] )
+                {
+                    factor = -1;
+                }
+                value = strtoul([[msg substringWithRange:NSMakeRange(4,2)] UTF8String],0,16);
+                [CDeviceData shareDeviceData].outsideTemp = [NSNumber numberWithInt:factor * value];
+                
+                [self didUpdateTemp];
+            }
+            else
+            {
+                assert(false);
+            }
         }
             break;
         default:
@@ -576,12 +628,26 @@
 
 - (void)queryAlarmIsOpen
 {
+   // NSLog(@"%@ %s",[NSDate description],__FUNCTION__);
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    //[dateFormatter setDateFormat:@"hh:mm:ss"]
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];      //毫秒
+    NSLog(@"Date%@ %s", [dateFormatter stringFromDate:[NSDate date]],__FUNCTION__);
+    
     [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALARM_IS_OPEN data:nil];
 }
 
 - (void)querySysDateTime
 {
     [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_SYS_DATETIME data:nil];
+}
+
+- (void)queryTemperature
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_TEMPERATURE data:nil];
 }
 
 - (void)queryAllRelayStatus
@@ -591,6 +657,13 @@
 
 - (void)queryAllAlarmCount
 {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    //[dateFormatter setDateFormat:@"hh:mm:ss"]
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];      //毫秒
+    NSLog(@"Date%@ %s", [dateFormatter stringFromDate:[NSDate date]],__FUNCTION__);
+    
     [self sendDataWithFunctionName:FUNCTION_NAME_QUERY_ALL_ALARM_COUNT data:nil];
 }
 
@@ -625,6 +698,15 @@
     //[msg release];
 }
 
+- (NSTimeInterval)onSocket:(AsyncSocket *)sock
+ shouldTimeoutWriteWithTag:(long)tag
+                   elapsed:(NSTimeInterval)elapsed
+                 bytesDone:(NSUInteger)length
+{
+    assert(false);
+    return 10.0;
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     float ver = [[[UIDevice currentDevice] systemVersion] floatValue];
@@ -654,9 +736,9 @@
     NSString *strPwd    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PASSWORD];
     NSString *strIdx    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
     
-    const static NSString* strTest = @"test1";
+    //const static NSString* strTest = @"test1";
     
-    NSString *last = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:strTest];
+   // NSString *last = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:strTest];
     
     
     BOOL bShowLogin     = YES;
@@ -671,7 +753,7 @@
     [_navController setToolbarHidden:YES];
     [_navController setNavigationBarHidden:YES];
     [self.window setRootViewController:_navController];
-    [_navController pushViewController:_mainUIViewController animated:NO];
+    //[_navController pushViewController:_mainUIViewController animated:NO];
     if ( YES == bShowLogin )
     {
         _loginViewController = [[LoginViewController alloc] init];
@@ -706,7 +788,7 @@
     {
         [_socket release];
         _socket = nil;
-        [self onTapLogin:[CLoginInfo shareLoginInfo].loginIp psw:[CLoginInfo shareLoginInfo].loginPassword port:[CLoginInfo shareLoginInfo].loginPort moduleIdx:[CLoginInfo shareLoginInfo].loginModuleIdx];
+        //[self onTapLogin:[CLoginInfo shareLoginInfo].loginIp psw:[CLoginInfo shareLoginInfo].loginPassword port:[CLoginInfo shareLoginInfo].loginPort moduleIdx:[CLoginInfo shareLoginInfo].loginModuleIdx];
     }
 }
 
@@ -752,5 +834,10 @@
 - (void)didCloseRelayAtIndex:(NSInteger)index
 {
     [self.functionViewController didCloseRelayAtIndex:index];
+}
+
+- (void)didUpdateTemp
+{
+    [self.functionViewController didUpdateTemp];
 }
 @end

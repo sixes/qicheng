@@ -43,4 +43,5 @@
 - (void)didStopCurtain;
 - (void)didOpenRelayAtIndex:(NSInteger)index;
 - (void)didCloseRelayAtIndex:(NSInteger)index;
+- (void)didUpdateTemp;
 @end

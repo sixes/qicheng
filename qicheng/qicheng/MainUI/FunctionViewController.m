@@ -133,12 +133,22 @@
         break;
         case 1:
         {
-            return [[CDeviceData shareDeviceData].relayName count];
+            return [[CDeviceData shareDeviceData].relayStatus count];
         }
         break;
         case 2:
         {
-            return [[CDeviceData shareDeviceData].sensorName count];    
+            return [[CDeviceData shareDeviceData].sensorStatus count];
+        }
+        break;
+        case 3:
+        {
+            return 1 + [[CDeviceData shareDeviceData].alarmCount count];
+        }
+        break;
+        case 4:
+        {
+            return 1;
         }
         break;
         default:
@@ -151,12 +161,12 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static const NSString *CellWithIdentifier = @"FunctionViewControllerTableIdentifier";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellWithIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:(NSString*)CellWithIdentifier];
     if (cell == nil)
     {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellWithIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:(NSString*)CellWithIdentifier];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
+        UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 40, 30)];
         sw.tag = [indexPath row];
         [sw addTarget:self action:@selector(updateSwitchAtIndexPath:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = sw;
@@ -227,6 +237,64 @@
             
         }
         break;
+        case 3:
+        {
+            switch ( indexPath.row )
+            {
+                case 0:
+                {
+                    cell.textLabel.text = @"报警";
+                    if ( YES == [CDeviceData shareDeviceData].bAlarmOpen )
+                    {
+                        cell.detailTextLabel.text = @"已启动";
+                    }
+                    else
+                    {
+                        cell.detailTextLabel.text = @"已关闭";
+                    }
+                    [cell.accessoryView setHidden:NO];
+                    NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+                    UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+                    cell.imageView.image = theImage;
+                }
+                    break;
+                default:
+                {
+                    [cell.accessoryView setHidden:YES];
+                    if ( indexPath.row < [[CDeviceData shareDeviceData].alarmCount count] + 1 )
+                    {
+                        NSLog(@"%ld rowrow:",(long)indexPath.row);
+                        cell.textLabel.text = [[CDeviceData shareDeviceData].sensorName objectAtIndex:indexPath.row - 1];
+                        int count = [[[CDeviceData shareDeviceData].alarmCount objectAtIndexedSubscript:indexPath.row - 1] unsignedLongValue];
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"报警%ld次",count];
+                    }
+                    
+               }
+                break;
+            }
+            
+        }
+        break;
+        case 4:
+        {
+            cell.textLabel.text = @"温度";
+            
+            if ( 999 != [[CDeviceData shareDeviceData].insideTemp intValue] &&
+                 999 != [[CDeviceData shareDeviceData].outsideTemp intValue] )
+            {
+                cell.detailTextLabel.text = [NSString stringWithFormat:@"室内:%d度 室外:%d度",[[CDeviceData shareDeviceData].insideTemp intValue],[[CDeviceData shareDeviceData].outsideTemp intValue]];
+            }
+            else
+            {
+                cell.detailTextLabel.text = @"点击更新";
+            }
+            
+            [cell.accessoryView setHidden:YES];
+            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+            cell.imageView.image = theImage;
+        }
+        break;
         default:
             break;
     }
@@ -236,14 +304,29 @@
 
 - (void)updateSwitchAtIndexPath:(UISwitch *)sw
 {
-    if ( YES == sw.on )
+    switch ( _currentIdx )
     {
-        [[AppDelegate shareAppDelegate] openRelayAtIndex:(NSUInteger)sw.tag];
+        case 3:
+            //开启报警
+        {
+            
+        }
+            break;
+        case 1:
+        {
+            if ( YES == sw.on )
+            {
+                [[AppDelegate shareAppDelegate] openRelayAtIndex:(NSUInteger)sw.tag];
+            }
+            else
+            {
+                [[AppDelegate shareAppDelegate] closeRelayAtIndex:(NSUInteger)sw.tag];
+            }
+        }
+        default:
+            break;
     }
-    else
-    {
-        [[AppDelegate shareAppDelegate] closeRelayAtIndex:(NSUInteger)sw.tag];
-    }
+    
 }
 
 - (void)loadCurtainView
@@ -323,19 +406,24 @@
 
                     [_btnBack2Main setHidden:YES];
                     [_btnBack setHidden:NO];
+                    _bFlipped = YES;
                 }
                 break;
-                    
+                
                 default:
                     break;
             }
         }
         break;
-            
+        case 4:
+        {
+            [[AppDelegate shareAppDelegate] queryTemperature];
+        }
+        break;
         default:
             break;
     }
-    _bFlipped = YES;
+    
 }
 
 - (NSUInteger) numberOfItemsInCarousel:(iCarousel *)carousel
@@ -434,6 +522,7 @@
                 assert(false);
             }
         }
+        break;
         case 2:
         {
             UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
@@ -447,6 +536,35 @@
                 assert(false);
             }
         }
+        break;
+        case 3:
+        {
+            UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
+            MenuItemView *itemView = (MenuItemView*)view;
+            if ( itemView )
+            {
+                [itemView setImage:img menuName:@"报警"];
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+        break;
+        case 4:
+        {
+            UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
+            MenuItemView *itemView = (MenuItemView*)view;
+            if ( itemView )
+            {
+                [itemView setImage:img menuName:@"温度"];
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+        break;
         default:
             break;
     }
@@ -524,13 +642,18 @@
 - (void)didOpenRelayAtIndex:(NSInteger)index
 {
     [[CDeviceData shareDeviceData].relayStatus setObject:[NSNumber numberWithUnsignedLong:1] atIndexedSubscript:index];
-    NSLog(@"relay status size:%d",[[CDeviceData shareDeviceData].relayStatus count]);
+   // NSLog(@"relay status size:%d",[[CDeviceData shareDeviceData].relayStatus count]);
     [_tableView reloadData];
 }
 
 - (void)didCloseRelayAtIndex:(NSInteger)index
 {
     [[CDeviceData shareDeviceData].relayStatus setObject:[NSNumber numberWithUnsignedLong:0] atIndexedSubscript:index];
+    [_tableView reloadData];
+}
+
+- (void)didUpdateTemp
+{
     [_tableView reloadData];
 }
 @end

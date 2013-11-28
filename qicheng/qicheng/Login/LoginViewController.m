@@ -278,11 +278,8 @@
         return ;
     } 
 
-    [[CLoginInfo shareLoginInfo] setLoginPassword:_textFieldPassword.text];
-    [[CLoginInfo shareLoginInfo] setLoginModuleIdx:_textFieldModuleIdx.text];
-    [[CLoginInfo shareLoginInfo] setLoginIp:_textFieldIp.text];
-    [[CLoginInfo shareLoginInfo] setLoginPort:_textFieldPort.text];
-    NSLog(@"psw:%@",[CLoginInfo shareLoginInfo].loginPassword);
+
+    //NSLog(@"psw:%@",[CLoginInfo shareLoginInfo].loginPassword);
     [[AppDelegate shareAppDelegate] onTapLogin:_textFieldIp.text  psw:_textFieldPassword.text port:_textFieldPort.text moduleIdx:_textFieldModuleIdx.text];
 }
 
