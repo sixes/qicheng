@@ -39,8 +39,8 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
 }
 
 @property (nonatomic,assign) BOOL bAlarmOpen;
-@property (nonatomic,assign) NSNumber *insideTemp;
-@property (nonatomic,assign) NSNumber *outsideTemp;
+@property (nonatomic,retain) NSNumber *insideTemp;
+@property (nonatomic,retain) NSNumber *outsideTemp;
 @property (nonatomic,retain) NSMutableArray *relayName;
 @property (nonatomic,retain) NSMutableArray *relayStatus;
 @property (nonatomic,retain) NSMutableArray *alarmCount;

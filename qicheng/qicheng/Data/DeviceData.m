@@ -48,8 +48,8 @@ static CDeviceData * _shareDeviceData;
         _relayStatus    = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
         _sensorName     = [[NSMutableArray alloc] initWithCapacity:ssCount];   
         _sensorStatus   = [[NSMutableArray alloc] initWithCapacity:ssCount];
-        _outsideTemp    = [NSNumber numberWithInt:999];
-        _insideTemp     = [NSNumber numberWithInt:999];
+        self.outsideTemp    = [NSNumber numberWithInt:999];
+        self.insideTemp     = [NSNumber numberWithInt:999];
         for (int i = 0; i != relayStatusCount; ++i)
         {
             [_relayName addObject:[NSString stringWithFormat:@"继电器%d",i + 1]];
