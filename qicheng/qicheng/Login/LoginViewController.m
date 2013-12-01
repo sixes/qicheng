@@ -317,5 +317,6 @@
     [_lblColon release];
     [_textFieldPort release];
     [_textFieldModuleIdx release];
+    [super dealloc];
 }
 @end
