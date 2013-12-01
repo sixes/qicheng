@@ -25,7 +25,10 @@
 @synthesize relayStatus     = _relayStatus;
 @synthesize sensorStatus    = _sensorStatus;
 @synthesize sensorName      = _sensorName;
-
+@synthesize timerDict       = _timerDict;
+@synthesize channelTimerStatus          = _channelTimerStatus;
+@synthesize channelOpenWhenTimerExpires = _channelOpenWhenTimerExpires;
+@synthesize channelTimerDate            = _channelTimerDate;
 
 static CDeviceData * _shareDeviceData;
 
@@ -48,6 +51,13 @@ static CDeviceData * _shareDeviceData;
         _relayStatus    = [[NSMutableArray alloc] initWithCapacity:relayStatusCount];
         _sensorName     = [[NSMutableArray alloc] initWithCapacity:ssCount];   
         _sensorStatus   = [[NSMutableArray alloc] initWithCapacity:ssCount];
+        
+        _channelTimerStatus             = [[NSMutableArray alloc] initWithCapacity:9];
+        _channelOpenWhenTimerExpires    = [[NSMutableArray alloc] initWithCapacity:5];
+        _channelTimerDate               = [[NSMutableArray alloc] initWithCapacity:5];
+        
+        _timerDict      = [[NSDictionary alloc] init];
+        
         self.outsideTemp    = [NSNumber numberWithInt:999];
         self.insideTemp     = [NSNumber numberWithInt:999];
         for (int i = 0; i != relayStatusCount; ++i)

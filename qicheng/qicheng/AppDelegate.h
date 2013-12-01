@@ -14,14 +14,18 @@
 #import "LoginViewController.h"
 #import "MainUIViewController.h"
 #import "SceneViewController.h"
+#import "SettingViewController.h"
+#import "TimerViewController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate,UINavigationControllerDelegate>
 {
     FunctionViewController *_functionViewController;
     LoginViewController *_loginViewController;
     MainUIViewController *_mainUIViewController;
     SceneViewController *_sceneViewController;
-
+    SettingViewController *_settingViewController;
+    TimerViewController *_timerViewController;
+    
     AsyncSocket *_socket;
     BOOL _bConnected;
     NSTimer * _timer;
@@ -42,6 +46,8 @@
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
 @property (nonatomic,assign) UINavigationController *navController;
 @property (nonatomic,assign) SceneViewController *sceneViewController;
+@property (nonatomic,assign) SettingViewController *settingViewController;
+@property (nonatomic,assign) TimerViewController *timerViewController;
 
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic,assign) NSCharacterSet *recvTailSet;
@@ -52,6 +58,8 @@
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx;
 
 //request
+- (void)enableAlarm;
+- (void)disableAlarm;
 - (void)openCurtain;
 - (void)stopCurtain;
 - (void)closeCurtain;
@@ -62,12 +70,16 @@
 - (void)queryAllTimerStatus;
 - (void)querySysDateTime;
 - (void)queryTemperature;
+- (void)set5TimerAtChannel:(NSUInteger)channel;
 - (void)openRelayAtIndex:(NSUInteger)index;
 - (void)closeRelayAtIndex:(NSUInteger)index;
 
 //response
+- (void)didEnableAlarm;
+- (void)didDisableAlarm;
 - (void)didCloseCurtain;
 - (void)didOpenCurtain;
+- (void)didSet5Timer;
 - (void)didStopCurtain;
 - (void)didOpenRelayAtIndex:(NSInteger)index;
 - (void)didCloseRelayAtIndex:(NSInteger)index;
@@ -80,4 +92,5 @@
 - (void)didReceiveData:(NSMutableData *)data;
 - (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData;
 
++ (NSString *)ToHex:(long long int)tmpid;
 @end

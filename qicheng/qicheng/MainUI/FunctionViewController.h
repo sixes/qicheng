@@ -37,7 +37,8 @@
 
 - (void)loadCurtainView;
 
-
+- (void)didEnableAlarm;
+- (void)didDisableAlarm;
 - (void)didCloseCurtain;
 - (void)didOpenCurtain;
 - (void)didStopCurtain;

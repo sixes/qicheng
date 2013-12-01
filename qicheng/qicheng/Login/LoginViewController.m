@@ -54,6 +54,8 @@
 {
     [_textFieldIp resignFirstResponder];
     [_textFieldPassword resignFirstResponder];
+    [_textFieldModuleIdx resignFirstResponder];
+    [_textFieldPort resignFirstResponder];
 }
 
 - (void)loadView
@@ -70,6 +72,7 @@
     _btnLogin           = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     _lblColon           = [[UILabel alloc] init];
     _lblLoginIp         = [[UILabel alloc] init];
+    _lblModuleIdx       = [[UILabel alloc] init];
     _lblPassword        = [[UILabel alloc] init];
     _textFieldIp        = [[UITextField alloc] init];
     _textFieldModuleIdx = [[UITextField alloc] init];
@@ -96,7 +99,9 @@
     {
         strIp = strLastIp;
     }
-    [_textFieldIp setFrame:CGRectMake(15, [AppDelegate shareAppDelegate].height / 3 - 20, [AppDelegate shareAppDelegate].width - 15 * 2, 40)];
+    int ipW = [AppDelegate shareAppDelegate].width - 15 * 2 - 100;
+    int ipY = [AppDelegate shareAppDelegate].height / 3 - 20;
+    [_textFieldIp setFrame:CGRectMake(15, ipY,ipW, 40)];
     [_textFieldIp setTextColor:[UIColor blackColor]];
     [_textFieldIp setBackgroundColor:[UIColor whiteColor]];
     [_textFieldIp setText:strIp];
@@ -113,21 +118,22 @@
     
     static const NSString* strColon = @":";
     CGSize colonStrSize = [strColon sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
-    [_lblColon setText:strColon];
+    [_lblColon setText:(NSString*)strColon];
     [_lblColon setTextColor:[UIColor blackColor]];
     [_lblColon setFont:[UIFont boldSystemFontOfSize:20.0]];
-    [_lblColon setFrame:CGRectMake(_textFieldIp.frame.origin.x + _textFieldIp.frame.size.width + 5, [AppDelegate shareAppDelegate].height * 2 / 3, colonStrSize.width, colonStrSize.height)];
+    [_lblColon setTextAlignment:NSTextAlignmentCenter];
+    [_lblColon setFrame:CGRectMake(_textFieldIp.frame.origin.x + _textFieldIp.frame.size.width + 5, [AppDelegate shareAppDelegate].height / 3 - 15, colonStrSize.width, colonStrSize.height)];
     [_lblColon setBackgroundColor:[UIColor clearColor]];
     [self.view addSubview:_lblColon];
 
-    NSString *strPort     = DEFAULT_LOGIN_PORT;
-    NSString *strLastPort = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_PORT];
+    NSString *strPort     = (NSString*)DEFAULT_LOGIN_PORT;
+    NSString *strLastPort = [[NSUserDefaults standardUserDefaults] stringForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PORT];
     if ( [strLastPort length] > 0 )
     {
         strPort = strLastPort;
     }
     CGSize portStrSize = [strPort sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
-    [_textFieldPort setFrame:CGRectMake(_lblColon.frame.origin.x + _lblColon.frame.size.width + 5,_lblColon.frame.origin.y,portStrSize.width,portStrSize.height)];
+    [_textFieldPort setFrame:CGRectMake(_lblColon.frame.origin.x + _lblColon.frame.size.width + 5,ipY,80,40)];
     [_textFieldPort setTextColor:[UIColor blackColor]];
     [_textFieldPort setBackgroundColor:[UIColor whiteColor]];
     [_textFieldPort setText:strPort];
@@ -136,22 +142,21 @@
     _textFieldPort.clearButtonMode       = UITextFieldViewModeWhileEditing;
     _textFieldPort.keyboardType          = UIKeyboardTypeDecimalPad;
     _textFieldPort.returnKeyType         = UIReturnKeyDone;
-    [_textFieldPort setSecureTextEntry:YES];
     [_textFieldPort setDelegate:self];
     [_textFieldPort setLeftViewMode:UITextFieldViewModeAlways];
-    //[_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
+    [_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:_textFieldPort];
 
     static const NSString *strModuleIdxName = @"模块地址 ";
     CGSize idxStrSize = [strModuleIdxName sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
-    [_lblModuleIdx setText:strModuleIdxName];
+    [_lblModuleIdx setText:(NSString*)strModuleIdxName];
     [_lblModuleIdx setTextColor:[UIColor grayColor]];
     [_lblModuleIdx setFont:[UIFont boldSystemFontOfSize:20.0]];
-    [_lblModuleIdx setFrame:CGRectMake(20, 200 + ipStrSize.height, idxStrSize.width, idxStrSize.height)];
+    [_lblModuleIdx setFrame:CGRectMake(5, [AppDelegate shareAppDelegate].height * 2 / 3, idxStrSize.width, idxStrSize.height)];
     [_lblModuleIdx setBackgroundColor:[UIColor clearColor]];
-
-    NSString *strIdx     = DEFAULT_LOGIN_MODULEINDEX;
-    NSString *strLastIdx = [[NSUserDefaults standardUserDefaults] stringForKey:USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
+    
+    NSString *strIdx     = (NSString*)DEFAULT_LOGIN_MODULEINDEX;
+    NSString *strLastIdx = [[NSUserDefaults standardUserDefaults] stringForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
     if ( [strLastIdx length] > 0 )
     {
         strIdx = strLastIdx;
@@ -160,16 +165,15 @@
     [_textFieldModuleIdx setTextColor:[UIColor blackColor]];
     [_textFieldModuleIdx setBackgroundColor:[UIColor whiteColor]];
     [_textFieldModuleIdx setText:strIdx];
-    [_textFieldModuleIdx setPlaceholder:DEFAULT_LOGIN_MODULEINDEX];
+    [_textFieldModuleIdx setPlaceholder:(NSString*)DEFAULT_LOGIN_MODULEINDEX];
     _textFieldModuleIdx.borderStyle           = UITextBorderStyleRoundedRect;
     _textFieldModuleIdx.clearButtonMode       = UITextFieldViewModeWhileEditing;
     _textFieldModuleIdx.keyboardType          = UIKeyboardTypeDecimalPad;
     _textFieldModuleIdx.returnKeyType         = UIReturnKeyDone;
-    [_textFieldModuleIdx setSecureTextEntry:YES];
     [_textFieldModuleIdx setDelegate:self];
     [_textFieldModuleIdx setLeftView:_lblModuleIdx];
     [_textFieldModuleIdx setLeftViewMode:UITextFieldViewModeAlways];
-    //[_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
+    [_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:_textFieldModuleIdx];
 
     static const NSString *pPsw = @"密码 ";
@@ -199,7 +203,7 @@
     [_textFieldPassword setDelegate:self];
     [_textFieldPassword setLeftView:_lblPassword];
     [_textFieldPassword setLeftViewMode:UITextFieldViewModeAlways];
-    //[_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
+    [_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:_textFieldPassword];
     
     [_btnLogin setTitle:@"登录" forState:UIControlStateNormal];
@@ -219,6 +223,9 @@
         [AppDelegate shareAppDelegate].mainUIViewController = [[MainUIViewController alloc] init];
     }
    // [self presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
+    
+    
+    //[[AppDelegate shareAppDelegate].navController presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
     
     [[AppDelegate shareAppDelegate].navController popToRootViewControllerAnimated:YES];
 }

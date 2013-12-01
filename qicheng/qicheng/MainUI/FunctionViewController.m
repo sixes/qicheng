@@ -38,7 +38,7 @@
     
     
     self.items = [NSMutableArray array];
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 6; i++)
     {
         [_items addObject:[NSNumber numberWithInt:i]];
     }
@@ -151,6 +151,11 @@
             return 1;
         }
         break;
+        case 5:
+        {
+            return [[CDeviceData shareDeviceData].relayStatus count] + [self.curtainArray count];
+        }
+        break;
         default:
             return 0;
             break;
@@ -165,7 +170,18 @@
     if (cell == nil)
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:(NSString*)CellWithIdentifier];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        switch ( _currentIdx )
+        {
+            case 5:
+                cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                break;
+                
+            default:
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                break;
+        }
+        
         UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 40, 30)];
         sw.tag = [indexPath row];
         [sw addTarget:self action:@selector(updateSwitchAtIndexPath:) forControlEvents:UIControlEventValueChanged];
@@ -268,7 +284,9 @@
                         int count = [[[CDeviceData shareDeviceData].alarmCount objectAtIndexedSubscript:indexPath.row - 1] unsignedLongValue];
                         cell.detailTextLabel.text = [NSString stringWithFormat:@"报警%ld次",count];
                     }
-                    
+                    NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+                    UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+                    cell.imageView.image = theImage;
                }
                 break;
             }
@@ -295,6 +313,23 @@
             cell.imageView.image = theImage;
         }
         break;
+        case 5:
+        {
+            if ( indexPath.row < [[CDeviceData shareDeviceData].relayStatus count] )
+            {
+                cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
+            }
+            else
+            {
+                cell.textLabel.text =  [self.curtainArray objectAtIndex:indexPath.row - [[CDeviceData shareDeviceData].relayStatus count]];
+            }
+            [cell.accessoryView setHidden:YES];
+            cell.detailTextLabel.text = @"";
+            NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
+            UIImage *theImage = [UIImage imageWithContentsOfFile:path];
+            cell.imageView.image = theImage;
+        }
+            break;
         default:
             break;
     }
@@ -309,7 +344,14 @@
         case 3:
             //开启报警
         {
-            
+            if ( YES == sw.on )
+            {
+                [[AppDelegate shareAppDelegate] enableAlarm];
+            }
+            else
+            {
+                [[AppDelegate shareAppDelegate] disableAlarm];
+            }
         }
             break;
         case 1:
@@ -420,6 +462,20 @@
             [[AppDelegate shareAppDelegate] queryTemperature];
         }
         break;
+        case 5:
+        {
+            
+                    if ( ! [AppDelegate shareAppDelegate].timerViewController )
+                    {
+                        [AppDelegate shareAppDelegate].timerViewController = [[TimerViewController alloc] init];
+                    }
+                    [[AppDelegate shareAppDelegate].timerViewController setChannel:indexPath.row];
+                    [[AppDelegate shareAppDelegate].navController setNavigationBarHidden:NO animated:YES];
+                    [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].timerViewController animated:YES];
+            
+            
+        }
+            break;
         default:
             break;
     }
@@ -433,7 +489,7 @@
 
 - (NSUInteger) numberOfVisibleItemsInCarousel:(iCarousel *)carousel
 {
-    return 5;
+    return [_items count];
 }
 
 - (void)onTapIndex:(NSUInteger)index
@@ -565,6 +621,20 @@
             }
         }
         break;
+        case 5:
+        {
+            UIImage *img = [UIImage imageNamed:@"main_home_devices.png"];
+            MenuItemView *itemView = (MenuItemView*)view;
+            if ( itemView )
+            {
+                [itemView setImage:img menuName:@"定时器"];
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+            break;
         default:
             break;
     }
@@ -653,6 +723,16 @@
 }
 
 - (void)didUpdateTemp
+{
+    [_tableView reloadData];
+}
+
+- (void)didEnableAlarm
+{
+    [_tableView reloadData];
+}
+
+- (void)didDisableAlarm
 {
     [_tableView reloadData];
 }

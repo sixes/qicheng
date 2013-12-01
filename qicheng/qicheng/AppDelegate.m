@@ -22,12 +22,23 @@
 @synthesize mainUIViewController    = _mainUIViewController;
 @synthesize navController           = _navController;
 @synthesize sceneViewController     = _sceneViewController;
+@synthesize settingViewController   = _settingViewController;
+@synthesize timerViewController     = _timerViewController;
+
 @synthesize recvTailSet = _recvTailSet;
 +(AppDelegate*) shareAppDelegate
 {
     return [[UIApplication sharedApplication] delegate];
 }
 
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if ( viewController != _settingViewController && viewController != _timerViewController )
+    {
+        NSLog(@"hide bar");
+        [navigationController setNavigationBarHidden:YES animated:YES];
+    }
+}
 -(BOOL)onTapLogin:(NSString *)loginIp psw:(NSString *)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx
 {
     NSLog(@"ip:%@ pwd:%@ f:%s l:%d",loginIp,loginPassWord,__FUNCTION__,__LINE__);
@@ -51,6 +62,26 @@
 - (void)onSocket:(AsyncSocket *)sock willDisconnectWithError:(NSError *)err
 {
     NSLog(@"%s %d",__FUNCTION__,__LINE__);
+    NSString *errDesp;
+    switch ( err.code ) {
+        case 2:
+        {
+            errDesp = @"连接超时";
+       }
+        break;
+            
+        default:
+            errDesp = [err localizedDescription];
+            break;
+    }
+    
+    UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"连接已断开"
+                                                    message:errDesp
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
+    [alert release];
 }
 
 - (void)didLoginSuccess
@@ -79,7 +110,7 @@
     [[NSUserDefaults standardUserDefaults] setObject:(id)@"thisone" forKey:@"test1"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     //[[AppDelegate shareAppDelegate] didLoginSuccess];
-    [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
+    
     
     //这里登录后的6个必查状态的发送请求，现在间隔必须在1秒多以上，不然设备不会返回数据
     //用tcp & upd debug查看过数据，发送的6个数据都可以正确地接收到。
@@ -90,7 +121,8 @@
     [NSTimer scheduledTimerWithTimeInterval:5.8 target:self selector:@selector(queryAllTimerStatus) userInfo:nil repeats:NO];
     [NSTimer scheduledTimerWithTimeInterval:6.0 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
     
-    [_navController pushViewController:_mainUIViewController animated:NO];
+    [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
+   // [_navController popToRootViewControllerAnimated:YES];
 };
 
 - (void)onSocket:(AsyncSocket *)sock didWriteDataWithTag:(long)tag
@@ -133,10 +165,30 @@
     switch ( fName[0] )
     {
         case FUNCTION_INDEX_INCORRECT_INSTRUCTION:
-            assert(false);
+        {
+            UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误"
+                                                            message:@"指令错误"
+                                                           delegate:self
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+            [alert release];
+        }
             break;
         case FUNCTION_INDEX_INCORRECT_PASSWORD:
-            assert(false);
+        {
+            UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误"
+                                                            message:@"密码错误,请重新登录"
+                                                           delegate:self
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+            [alert release];
+           // [_socket setDelegate:Nil];
+            [_socket disconnect];
+           // [_socket release];
+           // [self.navController pushViewController:self.loginViewController animated:YES];
+        }
             break;
         case FUNCTION_INDEX_QUERY_SYS_DATETIME:
             {
@@ -247,7 +299,55 @@
             {
                 //assert(false);
                 NSLog(@"need to impl FUNCTION_NAME_QUERY_ALL_TIMER_STATUS");
-            }   
+                if ( LENGTH_QUERY_ALL_TIMER_STATUS == [msg length] )
+                {
+                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                    formatter.dateFormat = @"HH:mm";
+                    for (int i = 0; i != 9; ++i)
+                    {
+                        //该通道定时器状态是否开启
+                        int openValue = 0;
+                        if ( [[msg substringWithRange:NSMakeRange(0 + 26 * i, 1)] intValue] > 0 )
+                        {
+                            openValue = 1;
+                        }
+                        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                        [dict setValue:[NSNumber numberWithUnsignedInt:openValue] forKey:(id)@"isOpenTimer"];
+                        
+                        NSMutableArray *openDeviceArray = [[NSMutableArray alloc] initWithCapacity:5];
+                        for (int j = 0 ; j != 5; ++j)
+                        {
+                            int openTheDevice = 0;
+                            if ( [[msg substringWithRange:NSMakeRange(1 + 26 * i + j, 1)] intValue] > 0 )
+                            {
+                                openTheDevice = 1;
+                            }
+                    
+                            [openDeviceArray setObject:[NSNumber numberWithUnsignedInt:openTheDevice] atIndexedSubscript:j];
+                        }
+                        [dict setValue:openDeviceArray forKey:@"isOpenDevice"];
+                        
+                        NSMutableArray *dateArray = [[NSMutableArray alloc] initWithCapacity:5];
+                        for (int k = 0; k != 5; ++k)
+                        {
+                            //NSUInteger hour = strtoul([[msg substringWithRange:NSMakeRange(2 + 26 * i + k * 5,2)] UTF8String],0,16);
+                            //NSUInteger min = strtoul([[msg substringWithRange:NSMakeRange(2 + 26 * i + k * 5 + 2,2)] UTF8String],0,16);
+                            NSString *strH = [msg substringWithRange:NSMakeRange(2 + 26 * i + k * 5,2)];
+                            NSString *strM = [msg substringWithRange:NSMakeRange(2 + 26 * i + k * 5 + 2,2)];
+                            NSString *strDate = [NSString stringWithFormat:@"%@:%@",strH,strM];
+                            [dateArray setObject:strDate atIndexedSubscript:k];
+                        }
+                        [dict setValue:dateArray forKey:@"dateArr"];
+                        
+                        [[CDeviceData shareDeviceData].channelTimerStatus setObject:dict atIndexedSubscript:i];
+                        //[[CDeviceData shareDeviceData].timerDict setValue:[NSNumber numberWithUnsignedChar:openValue] forKey:@"isOpen"];
+                    }
+                }
+                else
+                {
+                    assert(false);
+                }
+            }
             break; 
         case FUNCTION_INDEX_QUERY_ALL_SENSOR_STATUS:
             {
@@ -322,6 +422,23 @@
             {
                 assert(false);
             }
+        }
+            break;
+        case FUNCTION_INDEX_ENABLE_ALARM:
+        {
+            [CDeviceData shareDeviceData].bAlarmOpen = YES;
+            [self didEnableAlarm];
+        }
+            break;
+        case FUNCTION_INDEX_DISABLE_ALARM:
+        {
+            [CDeviceData shareDeviceData].bAlarmOpen = NO;
+            [self didDisableAlarm];
+        }
+            break;
+        case FUNCTION_INDEX_SET_5TIMER:
+        {
+            [self didSet5Timer];
         }
             break;
         default:
@@ -580,24 +697,30 @@
 - (void)onSocketDidDisconnect:(AsyncSocket *)sock
 {
     NSLog(@"%s %d",__FUNCTION__,__LINE__);
-    [CLoginInfo shareLoginInfo].bLogined = NO;
+    
     _bConnected = NO;
     [_socket release];
     _socket = nil;
 
     UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"连接已断开"
                                                         message:@"点确定重新登录"
-                                                       delegate:nil
+                                                       delegate:self
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
-   // [alert show];
+    //[alert show];
     [alert release];
-    if ( ! [AppDelegate shareAppDelegate].loginViewController )
+    if ( nil == [AppDelegate shareAppDelegate].loginViewController )
     {
         [AppDelegate shareAppDelegate].loginViewController = [[LoginViewController alloc] init];
     }
-    //[[AppDelegate shareAppDelegate].mainUIViewController presentViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES completion:nil];
-    //[_navController pushViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES];
+    if ( YES == [CLoginInfo shareLoginInfo].bLogined )
+    {
+        [_navController pushViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES];
+    }
+    
+
+    
+    [CLoginInfo shareLoginInfo].bLogined = NO;
     NSLog(@"bingoooooooo");
 }
 
@@ -728,37 +851,26 @@
     self.window.backgroundColor = [UIColor blackColor];
     [self.window makeKeyAndVisible];
     
-    //[[_loginViewController alloc] init];
-    _recvTailSet = [NSCharacterSet characterSetWithCharactersInString:PROTOCOL_RECV_TAIL];
+    //_recvTailSet = [NSCharacterSet characterSetWithCharactersInString:PROTOCOL_RECV_TAIL];
 
     NSString *strIp     = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_IP];
     NSString *strPort   = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PORT];
     NSString *strPwd    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PASSWORD];
     NSString *strIdx    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
     
-    //const static NSString* strTest = @"test1";
-    
-   // NSString *last = (NSString*)[[NSUserDefaults standardUserDefaults] objectForKey:strTest];
-    
-    
-    BOOL bShowLogin     = YES;
-    if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
-    {
-        bShowLogin = NO;
-        [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
-    }
     _mainUIViewController = [[MainUIViewController alloc] init];
-    //[self.window setRootViewController:_mainUIViewController];
-    _navController = [[UINavigationController alloc] init];
+    _navController = [[UINavigationController alloc] initWithRootViewController:_mainUIViewController];
     [_navController setToolbarHidden:YES];
     [_navController setNavigationBarHidden:YES];
+    [_navController setDelegate:self];
     [self.window setRootViewController:_navController];
-    //[_navController pushViewController:_mainUIViewController animated:NO];
-    if ( YES == bShowLogin )
+
+    _loginViewController = [[LoginViewController alloc] init];
+    [_navController pushViewController:_loginViewController animated:NO];
+    
+    if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
     {
-        _loginViewController = [[LoginViewController alloc] init];
-       // [_mainUIViewController presentViewController:_loginViewController animated:YES completion:nil];
-        [_navController pushViewController:_loginViewController animated:YES]; 
+        [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
     }
     
     return YES;
@@ -840,4 +952,101 @@
 {
     [self.functionViewController didUpdateTemp];
 }
+
+- (void)enableAlarm
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_ENABLE_ALARM data:nil];
+}
+
+- (void)disableAlarm
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_DISABLE_ALARM data:nil];
+}
+
+- (void)didEnableAlarm
+{
+    [self.functionViewController didEnableAlarm];
+}
+
+- (void)didDisableAlarm
+{
+    [self.functionViewController didDisableAlarm];
+}
+
+- (void)set5TimerAtChannel:(NSUInteger)channel
+{
+    if ( channel > 7 )
+    {
+        assert(false);
+        return;
+    }
+    NSMutableData *data = [[NSMutableData alloc] init];
+    NSString *strChannel = [NSString stringWithFormat:@"%2lu",(unsigned long)channel];
+    [data appendData:[strChannel dataUsingEncoding:NSASCIIStringEncoding]];
+    
+    NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:channel];
+    NSNumber *numIsOpen = [dict objectForKey:@"isOpenTimer"];
+    NSString *strOpen = [NSString stringWithFormat:@"%2d",[numIsOpen intValue]];
+    [data appendData:[strOpen dataUsingEncoding:NSASCIIStringEncoding]];
+    
+    NSMutableArray *openDevice = [dict objectForKey:@"isOpenDevice"];
+    NSMutableArray *date = [dict objectForKey:@"dateArr"];
+    for (int i = 0 ; i != 5; ++i )
+    {
+        NSNumber *numOpen = [openDevice objectAtIndexedSubscript:i];
+        NSString *strOpen = [NSString stringWithFormat:@"%2d",[numOpen intValue]];
+        [data appendData:[strOpen dataUsingEncoding:NSASCIIStringEncoding]];
+        
+        NSString *strDate = [date objectAtIndexedSubscript:i];
+        NSString *hour = [strDate substringWithRange:NSMakeRange(0, 2)];
+        NSString *min = [strDate substringWithRange:NSMakeRange(3, 2)];
+        NSString *hr16 = [self ToHex:[hour intValue]];
+        NSString *min16 = [self ToHex:[min intValue]];
+        [data appendData:[hr16 dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[min16 dataUsingEncoding:NSASCIIStringEncoding]];
+    }
+    [self sendDataWithFunctionName:FUNCTION_NAME_SET_5_TIMER data:data];
+}
+
+- (void)didSet5Timer
+{
+    
+}
+
+-(NSString *)ToHex:(long long int)tmpid
+{
+    NSString *nLetterValue;
+    NSString *str =@"";
+    long long int ttmpig;
+    for (int i = 0; i<9; i++) {
+        ttmpig=tmpid%16;
+        tmpid=tmpid/16;
+        switch (ttmpig)
+        {
+            case 10:
+                nLetterValue =@"A";break;
+            case 11:
+                nLetterValue =@"B";break;
+            case 12:
+                nLetterValue =@"C";break;
+            case 13:
+                nLetterValue =@"D";break;
+            case 14:
+                nLetterValue =@"E";break;
+            case 15:
+                nLetterValue =@"F";break;
+            default:nLetterValue=[NSString stringWithFormat:@"%lli",ttmpig];
+                
+        }
+        str = [nLetterValue stringByAppendingString:str];
+        if (tmpid == 0) {
+            break;
+        }
+        
+    }
+    return str;
+}
+
+
+
 @end

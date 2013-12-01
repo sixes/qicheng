@@ -30,6 +30,7 @@
 		EA198EA41843B5DD00F906F4 /* device_control_shade_on.png in Resources */ = {isa = PBXBuildFile; fileRef = EA198EA01843B5DD00F906F4 /* device_control_shade_on.png */; };
 		EA198EA51843B5DD00F906F4 /* device_shade_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = EA198EA11843B5DD00F906F4 /* device_shade_bg.png */; };
 		EA198EA71843B93700F906F4 /* device_stop_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA198EA61843B93700F906F4 /* device_stop_pressed.png */; };
+		EA1CBC7E184B1F56006C2E26 /* TimerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */; };
 		EA1EC3231838FA5300F46176 /* bg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1EC3221838FA5300F46176 /* bg3.jpg */; };
 		EA203AEB183133F4000B08C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEA183133F4000B08C3 /* Foundation.framework */; };
 		EA203AED183133F4000B08C3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEC183133F4000B08C3 /* CoreGraphics.framework */; };
@@ -52,6 +53,8 @@
 		EA6E4C7B1837A7AF00202A38 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6E4C781837A7AF00202A38 /* AsyncSocket.m */; };
 		EA6E4C7C1837A7AF00202A38 /* AsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6E4C7A1837A7AF00202A38 /* AsyncUdpSocket.m */; };
 		EA6E4C7E1837BA4B00202A38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6E4C7D1837BA4B00202A38 /* CFNetwork.framework */; };
+		EAA8E9C4184A405E003F77B5 /* main_home_system.png in Resources */ = {isa = PBXBuildFile; fileRef = EAA8E9C3184A405E003F77B5 /* main_home_system.png */; };
+		EAA8E9C7184A4BA5003F77B5 /* SettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAA8E9C6184A4BA5003F77B5 /* SettingViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +97,8 @@
 		EA198EA11843B5DD00F906F4 /* device_shade_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_shade_bg.png; path = Resource/device_shade_bg.png; sourceTree = "<group>"; };
 		EA198EA61843B93700F906F4 /* device_stop_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_stop_pressed.png; path = Resource/device_stop_pressed.png; sourceTree = "<group>"; };
 		EA1C6CCB183A73C200F9C4D8 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		EA1CBC7C184B1F56006C2E26 /* TimerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TimerViewController.h; path = MainUI/TimerViewController.h; sourceTree = "<group>"; };
+		EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TimerViewController.m; path = MainUI/TimerViewController.m; sourceTree = "<group>"; };
 		EA1EC3221838FA5300F46176 /* bg3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bg3.jpg; path = Resource/bg3.jpg; sourceTree = "<group>"; };
 		EA203AE7183133F4000B08C3 /* qicheng.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = qicheng.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA203AEA183133F4000B08C3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -125,6 +130,9 @@
 		EA6E4C791837A7AF00202A38 /* AsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AsyncUdpSocket.h; path = AsyncSocket/AsyncUdpSocket.h; sourceTree = "<group>"; };
 		EA6E4C7A1837A7AF00202A38 /* AsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AsyncUdpSocket.m; path = AsyncSocket/AsyncUdpSocket.m; sourceTree = "<group>"; };
 		EA6E4C7D1837BA4B00202A38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		EAA8E9C3184A405E003F77B5 /* main_home_system.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = main_home_system.png; path = Resource/main_home_system.png; sourceTree = "<group>"; };
+		EAA8E9C5184A4BA5003F77B5 /* SettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SettingViewController.h; path = MainUI/SettingViewController.h; sourceTree = "<group>"; };
+		EAA8E9C6184A4BA5003F77B5 /* SettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SettingViewController.m; path = MainUI/SettingViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +183,10 @@
 				EA1132D5183FC690007EA1AD /* MenuItemView.m */,
 				EA203D591842298D00EAAF27 /* FunctionViewController.h */,
 				EA203D5A1842298D00EAAF27 /* FunctionViewController.m */,
+				EAA8E9C5184A4BA5003F77B5 /* SettingViewController.h */,
+				EAA8E9C6184A4BA5003F77B5 /* SettingViewController.m */,
+				EA1CBC7C184B1F56006C2E26 /* TimerViewController.h */,
+				EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */,
 			);
 			name = MainUI;
 			sourceTree = "<group>";
@@ -298,6 +310,7 @@
 		EA6E4C7F1837DBDA00202A38 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				EAA8E9C3184A405E003F77B5 /* main_home_system.png */,
 				EA15222E184650D7009771E1 /* general_back_normal.png */,
 				EA15222F184650D7009771E1 /* general_back_pressed.png */,
 				EA152230184650D7009771E1 /* home_pressed.png */,
@@ -414,6 +427,7 @@
 				EA203D661842325600EAAF27 /* page.png in Resources */,
 				EA203AF5183133F4000B08C3 /* InfoPlist.strings in Resources */,
 				EA15223E184650D7009771E1 /* scene_gallery_4.png in Resources */,
+				EAA8E9C4184A405E003F77B5 /* main_home_system.png in Resources */,
 				EA203AFD183133F4000B08C3 /* Images.xcassets in Resources */,
 				EA1132DA183FCDE9007EA1AD /* main_home_room.png in Resources */,
 				EA15223D184650D7009771E1 /* scene_gallery_3.png in Resources */,
@@ -441,6 +455,8 @@
 			files = (
 				EA193A2C183D14B30027280E /* MainUIViewController.m in Sources */,
 				EA1132D0183FC215007EA1AD /* DeviceData.m in Sources */,
+				EA1CBC7E184B1F56006C2E26 /* TimerViewController.m in Sources */,
+				EAA8E9C7184A4BA5003F77B5 /* SettingViewController.m in Sources */,
 				EA203AFB183133F4000B08C3 /* AppDelegate.m in Sources */,
 				EA1132D1183FC215007EA1AD /* LoginInfo.m in Sources */,
 				EA203D6218422EB500EAAF27 /* iCarousel.m in Sources */,

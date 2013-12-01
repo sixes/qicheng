@@ -56,6 +56,12 @@
     MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 170, 130, 130) image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:YES];
     [self.view addSubview:item3];
     [item3 release];
+    
+    UIImage *img4 = [UIImage imageNamed:@"main_home_system.png"];
+    //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
+    MenuItemView *item4 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 170, 130, 130) image:img4 menuName:@"系统" menuItemType:3 dispatchEvent:YES];
+    [self.view addSubview:item4];
+    [item4 release];
 }
 
 - (void)onTapMenuItemWithType:(NSUInteger)type
@@ -80,6 +86,16 @@
             }
             //[self presentViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES completion:Nil];
             [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].functionViewController animated:YES];
+        }
+        break;
+        case 3:
+        {
+            if ( ! [AppDelegate shareAppDelegate].settingViewController )
+            {
+                [AppDelegate shareAppDelegate].settingViewController = [[SettingViewController alloc] init];
+            }
+            [[AppDelegate shareAppDelegate].navController setNavigationBarHidden:NO animated:YES];
+            [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].settingViewController animated:YES];
         }
         break;
         default:
