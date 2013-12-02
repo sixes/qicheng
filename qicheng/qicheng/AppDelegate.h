@@ -58,6 +58,7 @@
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx;
 
 //request
+- (void)clearCounter;
 - (void)enableAlarm;
 - (void)disableAlarm;
 - (void)openCurtain;
@@ -71,15 +72,18 @@
 - (void)querySysDateTime;
 - (void)queryTemperature;
 - (void)set5TimerAtChannel:(NSUInteger)channel;
+- (void)setSysDateTime;
 - (void)openRelayAtIndex:(NSUInteger)index;
 - (void)closeRelayAtIndex:(NSUInteger)index;
 
 //response
+- (void)didClearCounter;
 - (void)didEnableAlarm;
 - (void)didDisableAlarm;
 - (void)didCloseCurtain;
 - (void)didOpenCurtain;
 - (void)didSet5Timer;
+- (void)didSetSysDateTime;
 - (void)didStopCurtain;
 - (void)didOpenRelayAtIndex:(NSInteger)index;
 - (void)didCloseRelayAtIndex:(NSInteger)index;

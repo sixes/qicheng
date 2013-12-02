@@ -273,6 +273,7 @@
     NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:_channel];
     NSMutableArray *array = [dict objectForKey:@"dateArr"];
     [array setObject:strDate atIndexedSubscript:_selectedTableIdx];
+    [formatter release];
     
     NSIndexPath *ip = [NSIndexPath indexPathForRow:_selectedTableIdx inSection:0];
     NSArray *arr = [NSArray arrayWithObject:ip];
@@ -285,10 +286,12 @@
     }
 }
 
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 @end

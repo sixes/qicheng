@@ -441,6 +441,16 @@
             [self didSet5Timer];
         }
             break;
+        case FUNCTION_INDEX_CLEAR_COUNTER:
+        {
+            [self didClearCounter];
+        }
+            break;
+        case FUNCTION_INDEX_SET_SYS_DATETIME:
+        {
+            [self didSetSysDateTime];
+        }
+            break;
         default:
             break;
     }
@@ -1006,6 +1016,7 @@
         [data appendData:[min16 dataUsingEncoding:NSASCIIStringEncoding]];
     }
     [self sendDataWithFunctionName:FUNCTION_NAME_SET_5_TIMER data:data];
+    [data release];
 }
 
 - (void)didSet5Timer
@@ -1047,6 +1058,85 @@
     return str;
 }
 
+- (void)clearCounter
+{
+    [self sendDataWithFunctionName:FUNCTION_NAME_CLEAR_COUNTER data:nil];
+}
 
+- (void)didClearCounter
+{
+    [self.settingViewController didClearCounter];
+}
 
+- (void)setSysDateTime
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setLocale:[NSLocale systemLocale]];
+    [formatter setDateFormat:@"yy-MM-dd HH:mm:ss"];
+    NSString *strDate = [formatter stringFromDate:[CDeviceData shareDeviceData].sysDateTime];
+    NSLog(@"select DT:%@",strDate);
+    if ( 17 == [strDate length] )
+    {
+        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        NSDateComponents *components = [gregorian components:NSWeekdayCalendarUnit fromDate:[CDeviceData shareDeviceData].sysDateTime];
+        
+        NSLog(@"weekDay:%d",[components weekday]);
+        
+        NSString *year = [self ToHex:[[strDate substringWithRange:NSMakeRange(0, 2)] intValue]];
+        NSString *month = [self ToHex:[[strDate substringWithRange:NSMakeRange(3, 2)] intValue]];
+        NSString *day = [self ToHex:[[strDate substringWithRange:NSMakeRange(6, 2)] intValue]];
+        NSString *hour = [self ToHex:[[strDate substringWithRange:NSMakeRange(9,2)] intValue]];
+        NSString *min = [self ToHex:[[strDate substringWithRange:NSMakeRange(12, 2)] intValue]];
+        NSString *sec = [self ToHex:[[strDate substringWithRange:NSMakeRange(15, 2)] intValue]];
+        NSString *weekday = [NSString stringWithFormat:@"%d",[components weekday]];
+        
+        if ( [year length] < 2 )
+        {
+            year = [NSString stringWithFormat:@"0%@",year];
+        }
+        if ( [month length] < 2 )
+        {
+            month = [NSString stringWithFormat:@"0%@",month];
+        }
+        if ( [day length] < 2 )
+        {
+            day = [NSString stringWithFormat:@"0%@",day];
+        }
+        if ( [hour length] < 2 )
+        {
+            hour = [NSString stringWithFormat:@"0%@",hour];
+        }
+        if ( [min length] < 2 )
+        {
+            min = [NSString stringWithFormat:@"0%@",min];
+        }
+        if ( [sec length] < 2 )
+        {
+            sec = [NSString stringWithFormat:@"0%@",sec];
+        }
+        if ( [weekday length] < 2 )
+        {
+            weekday = [NSString stringWithFormat:@"0%@",weekday];
+        }
+        NSMutableData *data = [[NSMutableData alloc] init];
+        [data appendData:[year dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[month dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[day dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[hour dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[min dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[sec dataUsingEncoding:NSASCIIStringEncoding]];
+        [data appendData:[weekday dataUsingEncoding:NSASCIIStringEncoding]];
+        
+        [self sendDataWithFunctionName:FUNCTION_NAME_SET_SYS_DATETIME data:data];
+        [data release];
+        [gregorian release];
+    }
+    [formatter release];
+    
+}
+
+- (void)didSetSysDateTime
+{
+    [self.settingViewController didSetSysDateTime];
+}
 @end

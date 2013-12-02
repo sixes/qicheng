@@ -26,4 +26,5 @@
 - (void)setChannel:(NSUInteger)channel;
 - (void)updateOpenBtnStatus;
 
+
 @end

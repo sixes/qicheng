@@ -32,6 +32,7 @@
 #define LENGTH_QUERY_SYS_DATETIME				(14)
 #define LENGTH_QUERY_TEMPERATURE                (6)
 
+#define FUNCTION_INDEX_CLEAR_COUNTER            'l'
 #define FUNCTION_INDEX_ENABLE_ALARM             'm'
 #define FUNCTION_INDEX_DISABLE_ALARM            'n'
 #define FUNCTION_INDEX_CLOSE_CURTAIN			'g'
@@ -41,6 +42,7 @@
 #define FUNCTION_INDEX_OPEN_CURTAIN				'e'
 #define FUNCTION_INDEX_OPEN_RELAY               'a'
 #define FUNCTION_INDEX_SET_5TIMER               'z'
+#define FUNCTION_INDEX_SET_SYS_DATETIME         't'
 #define FUNCTION_INDEX_STOP_CURTAIN				'f'
 #define FUNCTION_INDEX_QUERY_ALARM_IS_OPEN		'y'
 #define FUNCTION_INDEX_QUERY_ALL_ALARM_COUNT	'x'
@@ -50,6 +52,7 @@
 #define FUNCTION_INDEX_QUERY_SYS_DATETIME		's'
 #define FUNCTION_INDEX_QUERY_TEMPERATURE        'q'
 
+#define FUNCTION_NAME_CLEAR_COUNTER             @"l"
 #define FUNCTION_NAME_ENABLE_ALARM              @"m"
 #define FUNCTION_NAME_DISABLE_ALARM             @"n"
 #define FUNCTION_NAME_CLOSE_CURTAIN				@"g"
@@ -59,6 +62,7 @@
 #define FUNCTION_NAME_OPEN_CURTAIN				@"e"
 #define FUNCTION_NAME_OPEN_RELAY                @"a"
 #define FUNCTION_NAME_SET_5_TIMER               @"z"
+#define FUNCTION_NAME_SET_SYS_DATETIME          @"t"
 #define FUNCTION_NAME_STOP_CURTAIN				@"f"
 #define FUNCTION_NAME_QUERY_ALARM_IS_OPEN		@"y"
 #define FUNCTION_NAME_QUERY_ALL_ALARM_COUNT		@"x"
