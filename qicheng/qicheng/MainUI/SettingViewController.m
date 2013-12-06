@@ -44,10 +44,7 @@
 }
 
 - (void)onSetTime
-{
-
-    
-    
+{    
     [CDeviceData shareDeviceData].sysDateTime = _datePicker.date;
     [[AppDelegate shareAppDelegate] setSysDateTime];
 }
@@ -107,8 +104,25 @@
                 break;
                 default:
                     break;
+        }
+            break;
+        case 1:
+        {
+            switch ( indexPath.row ) {
+                case 0:
+                {
+                    if ( ! [AppDelegate shareAppDelegate].changePasswordViewController )
+                    {
+                        [AppDelegate shareAppDelegate].changePasswordViewController = [[ChangePasswodViewController alloc] init];
+                    }
+                    [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].changePasswordViewController animated:YES];
+                }
+                    break;
+                    
+                default:
+                    break;
             }
-            
+        }
             
             break;
             

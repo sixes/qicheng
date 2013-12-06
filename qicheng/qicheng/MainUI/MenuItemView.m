@@ -30,6 +30,7 @@
         [_lbl setFont:[UIFont boldSystemFontOfSize:20.0]];
         [_lbl setTextAlignment:NSTextAlignmentCenter];
         [_lbl setTextColor:[UIColor whiteColor]];
+        [_lbl setBackgroundColor:[UIColor clearColor]];
         [self addSubview:_lbl];
 
         [self setImage:img menuName:name];

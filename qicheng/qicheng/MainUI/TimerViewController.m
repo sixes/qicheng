@@ -62,6 +62,11 @@
 
 - (void)updateOpenBtnStatus
 {
+    if ( _channel >= [[CDeviceData shareDeviceData].channelTimerStatus count] )
+    {
+        //it seems NOT connected...
+        return ;
+    }
     NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:_channel];
     NSNumber *numOpen = [dict objectForKey:@"isOpenTimer"];
     NSString *strBtn;
@@ -217,15 +222,24 @@
     {
         openValue = 1;
     }
-    NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:_channel];
-    NSMutableArray *array = [dict objectForKey:@"isOpenDevice"];
-    [array setObject:[NSNumber numberWithUnsignedInt:openValue] atIndexedSubscript:sw.tag];
+    
+    if ( _channel < [[CDeviceData shareDeviceData].channelTimerStatus count] )
+    {
+        NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:_channel];
+        NSMutableArray *array = [dict objectForKey:@"isOpenDevice"];
+        [array setObject:[NSNumber numberWithUnsignedInt:openValue] atIndexedSubscript:sw.tag];
+    }
+    
     
     NSLog(@"debgu");
 }
 
 - (void)onBtnOpen
 {
+    if ( _channel >= [[CDeviceData shareDeviceData].channelTimerStatus count] )
+    {
+        return ;
+    }
     NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:_channel];
     NSNumber *numOpen = [dict objectForKey:@"isOpenTimer"];
     if ( [numOpen intValue] > 0 )

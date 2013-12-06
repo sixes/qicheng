@@ -32,6 +32,7 @@
 #define LENGTH_QUERY_SYS_DATETIME				(14)
 #define LENGTH_QUERY_TEMPERATURE                (6)
 
+#define FUNCTION_INDEX_CHANGE_PASSWORD          'p'
 #define FUNCTION_INDEX_CLEAR_COUNTER            'l'
 #define FUNCTION_INDEX_ENABLE_ALARM             'm'
 #define FUNCTION_INDEX_DISABLE_ALARM            'n'
@@ -52,6 +53,7 @@
 #define FUNCTION_INDEX_QUERY_SYS_DATETIME		's'
 #define FUNCTION_INDEX_QUERY_TEMPERATURE        'q'
 
+#define FUNCTION_NAME_CHANGE_PASSWORD           @"p"
 #define FUNCTION_NAME_CLEAR_COUNTER             @"l"
 #define FUNCTION_NAME_ENABLE_ALARM              @"m"
 #define FUNCTION_NAME_DISABLE_ALARM             @"n"

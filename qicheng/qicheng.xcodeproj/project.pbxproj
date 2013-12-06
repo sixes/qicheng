@@ -30,6 +30,7 @@
 		EA198EA41843B5DD00F906F4 /* device_control_shade_on.png in Resources */ = {isa = PBXBuildFile; fileRef = EA198EA01843B5DD00F906F4 /* device_control_shade_on.png */; };
 		EA198EA51843B5DD00F906F4 /* device_shade_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = EA198EA11843B5DD00F906F4 /* device_shade_bg.png */; };
 		EA198EA71843B93700F906F4 /* device_stop_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA198EA61843B93700F906F4 /* device_stop_pressed.png */; };
+		EA1BD622184F8C0D00AAD9EF /* ChangePasswodViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1BD621184F8C0D00AAD9EF /* ChangePasswodViewController.m */; };
 		EA1CBC7E184B1F56006C2E26 /* TimerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */; };
 		EA1EC3231838FA5300F46176 /* bg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EA1EC3221838FA5300F46176 /* bg3.jpg */; };
 		EA203AEB183133F4000B08C3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA203AEA183133F4000B08C3 /* Foundation.framework */; };
@@ -96,6 +97,8 @@
 		EA198EA01843B5DD00F906F4 /* device_control_shade_on.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_control_shade_on.png; path = Resource/device_control_shade_on.png; sourceTree = "<group>"; };
 		EA198EA11843B5DD00F906F4 /* device_shade_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_shade_bg.png; path = Resource/device_shade_bg.png; sourceTree = "<group>"; };
 		EA198EA61843B93700F906F4 /* device_stop_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = device_stop_pressed.png; path = Resource/device_stop_pressed.png; sourceTree = "<group>"; };
+		EA1BD620184F8C0D00AAD9EF /* ChangePasswodViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChangePasswodViewController.h; path = MainUI/ChangePasswodViewController.h; sourceTree = "<group>"; };
+		EA1BD621184F8C0D00AAD9EF /* ChangePasswodViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChangePasswodViewController.m; path = MainUI/ChangePasswodViewController.m; sourceTree = "<group>"; };
 		EA1C6CCB183A73C200F9C4D8 /* Config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		EA1CBC7C184B1F56006C2E26 /* TimerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TimerViewController.h; path = MainUI/TimerViewController.h; sourceTree = "<group>"; };
 		EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TimerViewController.m; path = MainUI/TimerViewController.m; sourceTree = "<group>"; };
@@ -187,6 +190,8 @@
 				EAA8E9C6184A4BA5003F77B5 /* SettingViewController.m */,
 				EA1CBC7C184B1F56006C2E26 /* TimerViewController.h */,
 				EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */,
+				EA1BD620184F8C0D00AAD9EF /* ChangePasswodViewController.h */,
+				EA1BD621184F8C0D00AAD9EF /* ChangePasswodViewController.m */,
 			);
 			name = MainUI;
 			sourceTree = "<group>";
@@ -456,6 +461,7 @@
 				EA193A2C183D14B30027280E /* MainUIViewController.m in Sources */,
 				EA1132D0183FC215007EA1AD /* DeviceData.m in Sources */,
 				EA1CBC7E184B1F56006C2E26 /* TimerViewController.m in Sources */,
+				EA1BD622184F8C0D00AAD9EF /* ChangePasswodViewController.m in Sources */,
 				EAA8E9C7184A4BA5003F77B5 /* SettingViewController.m in Sources */,
 				EA203AFB183133F4000B08C3 /* AppDelegate.m in Sources */,
 				EA1132D1183FC215007EA1AD /* LoginInfo.m in Sources */,
@@ -512,7 +518,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -525,6 +531,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -541,9 +548,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -551,7 +560,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -564,7 +573,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Yongbin Peng (7U9E73XN99)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -574,22 +584,29 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Release;
 		};
 		EA203B14183133F4000B08C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "qicheng/qicheng-Prefix.pch";
 				INFOPLIST_FILE = "qicheng/qicheng-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -597,13 +614,18 @@
 		EA203B15183133F4000B08C3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yongbin Peng (7U9E73XN99)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "qicheng/qicheng-Prefix.pch";
 				INFOPLIST_FILE = "qicheng/qicheng-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
+				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -87,7 +87,7 @@
 
     static const NSString *pStr = @"地址 ";
     CGSize ipStrSize = [pStr sizeWithFont:[UIFont boldSystemFontOfSize:20.0]];
-    [_lblLoginIp setText:pStr];
+    [_lblLoginIp setText:(NSString*)pStr];
     [_lblLoginIp setTextColor:[UIColor grayColor]];
     [_lblLoginIp setFont:[UIFont boldSystemFontOfSize:20.0]];
     [_lblLoginIp setFrame:CGRectMake(5, [AppDelegate shareAppDelegate].height * 2 / 3, ipStrSize.width, ipStrSize.height)];
@@ -111,7 +111,7 @@
     [_textFieldIp setLeftView:_lblLoginIp];
     _textFieldIp.borderStyle        = UITextBorderStyleRoundedRect;
     _textFieldIp.clearButtonMode    = UITextFieldViewModeWhileEditing;
-    _textFieldIp.keyboardType       = UIKeyboardAppearanceDefault;
+    _textFieldIp.keyboardType       = UIKeyboardTypeASCIICapable;
     _textFieldIp.returnKeyType      = UIReturnKeyNext;
     [_textFieldIp setDelegate:self];
     [self.view addSubview:_textFieldIp];
@@ -207,7 +207,7 @@
     [self.view addSubview:_textFieldPassword];
     
     [_btnLogin setTitle:@"登录" forState:UIControlStateNormal];
-    [_btnLogin setTitleColor:[UIColor whiteColor] forState:UIControlContentHorizontalAlignmentCenter];
+    [_btnLogin setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [_btnLogin setFrame:CGRectMake(15,_textFieldPassword.frame.origin.y + _textFieldPassword.frame.size.height + 10, [AppDelegate shareAppDelegate].width - 15 * 2, 45)];
     [_btnLogin setBackgroundColor:[UIColor lightGrayColor]];
     [_btnLogin addTarget:self action:@selector(onBtnLogin:) forControlEvents:UIControlEventTouchUpInside];
@@ -226,8 +226,17 @@
     
     
     //[[AppDelegate shareAppDelegate].navController presentViewController:[AppDelegate shareAppDelegate].mainUIViewController animated:YES completion:nil];
+    if ( [self respondsToSelector:@selector(dismissViewControllerAnimated:completion:)] )
+    {
+        [self dismissViewControllerAnimated:YES completion:NULL];
+    }
+    else
+    {
+        [self.parentViewController dismissModalViewControllerAnimated:NO];
+    }
+    //[[AppDelegate shareAppDelegate].navController popToRootViewControllerAnimated:YES];
     
-    [[AppDelegate shareAppDelegate].navController popToRootViewControllerAnimated:YES];
+//    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void)onPassWordDone:(id)sender

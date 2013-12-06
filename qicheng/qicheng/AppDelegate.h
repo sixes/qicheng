@@ -16,9 +16,12 @@
 #import "SceneViewController.h"
 #import "SettingViewController.h"
 #import "TimerViewController.h"
+#import "ChangePasswodViewController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate,UINavigationControllerDelegate>
 {
+    
+    ChangePasswodViewController *_changePasswordViewController;
     FunctionViewController *_functionViewController;
     LoginViewController *_loginViewController;
     MainUIViewController *_mainUIViewController;
@@ -41,6 +44,7 @@
 @property (assign) CGFloat height;
 @property (assign) CGFloat width;
 @property (nonatomic,retain) NSMutableData *readData;
+@property (nonatomic,assign) ChangePasswodViewController *changePasswordViewController;
 @property (nonatomic,assign) FunctionViewController *functionViewController;
 @property (nonatomic,assign) LoginViewController *loginViewController;
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
@@ -58,6 +62,7 @@
 - (BOOL)onTapLogin:(NSString*)loginIp psw:(NSString*)loginPassWord port:(NSString*)port moduleIdx:(NSString*)idx;
 
 //request
+- (void)changePassword:(NSString*)password;
 - (void)clearCounter;
 - (void)enableAlarm;
 - (void)disableAlarm;
@@ -77,6 +82,7 @@
 - (void)closeRelayAtIndex:(NSUInteger)index;
 
 //response
+- (void)didChangePassword;
 - (void)didClearCounter;
 - (void)didEnableAlarm;
 - (void)didDisableAlarm;
@@ -96,5 +102,5 @@
 - (void)didReceiveData:(NSMutableData *)data;
 - (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData;
 
-+ (NSString *)ToHex:(long long int)tmpid;
+- (NSString *)ToHex:(long long int)tmpid;
 @end

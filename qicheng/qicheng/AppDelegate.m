@@ -17,6 +17,7 @@
 @synthesize height      = _height;
 @synthesize readData    = _readData;
 @synthesize width       = _width;
+@synthesize changePasswordViewController    = _changePasswordViewController;
 @synthesize functionViewController  = _functionViewController;
 @synthesize loginViewController     = _loginViewController;
 @synthesize mainUIViewController    = _mainUIViewController;
@@ -33,7 +34,7 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-    if ( viewController != _settingViewController && viewController != _timerViewController )
+    if ( viewController != _settingViewController && viewController != _timerViewController && viewController != _changePasswordViewController )
     {
         NSLog(@"hide bar");
         [navigationController setNavigationBarHidden:YES animated:YES];
@@ -122,6 +123,9 @@
     [NSTimer scheduledTimerWithTimeInterval:6.0 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
     
     [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
+    
+   // [_navController dismissViewControllerAnimated:YES completion:NULL];
+//    [_navController.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
    // [_navController popToRootViewControllerAnimated:YES];
 };
 
@@ -188,6 +192,21 @@
             [_socket disconnect];
            // [_socket release];
            // [self.navController pushViewController:self.loginViewController animated:YES];
+            
+            //[self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
+            if ( ! self.loginViewController )
+            {
+                self.loginViewController = [[LoginViewController alloc] init];
+            }
+            if ( NO == [self.navController.viewControllers containsObject:self.loginViewController] )
+            {
+                //[self.navController pushViewController:self.loginViewController animated:YES];
+                [self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
+            }
+            else
+            {
+                [self.navController popToViewController:self.loginViewController animated:YES];
+            }
         }
             break;
         case FUNCTION_INDEX_QUERY_SYS_DATETIME:
@@ -449,6 +468,11 @@
         case FUNCTION_INDEX_SET_SYS_DATETIME:
         {
             [self didSetSysDateTime];
+        }
+            break;
+        case FUNCTION_INDEX_CHANGE_PASSWORD:
+        {
+            [self didChangePassword];
         }
             break;
         default:
@@ -725,7 +749,7 @@
     }
     if ( YES == [CLoginInfo shareLoginInfo].bLogined )
     {
-        [_navController pushViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES];
+        //[_navController pushViewController:[AppDelegate shareAppDelegate].loginViewController animated:YES];
     }
     
 
@@ -859,7 +883,7 @@
     _height = [[UIScreen mainScreen] bounds].size.height;
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor blackColor];
-    [self.window makeKeyAndVisible];
+    
     
     //_recvTailSet = [NSCharacterSet characterSetWithCharactersInString:PROTOCOL_RECV_TAIL];
 
@@ -868,20 +892,26 @@
     NSString *strPwd    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PASSWORD];
     NSString *strIdx    = [[NSUserDefaults standardUserDefaults] objectForKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
     
-    _mainUIViewController = [[MainUIViewController alloc] init];
-    _navController = [[UINavigationController alloc] initWithRootViewController:_mainUIViewController];
-    [_navController setToolbarHidden:YES];
-    [_navController setNavigationBarHidden:YES];
-    [_navController setDelegate:self];
-    [self.window setRootViewController:_navController];
-
-    _loginViewController = [[LoginViewController alloc] init];
-    [_navController pushViewController:_loginViewController animated:NO];
+    self.mainUIViewController = [[MainUIViewController alloc] init];
+    self.navController = [[UINavigationController alloc] initWithRootViewController:self.mainUIViewController];
+    [self.navController setToolbarHidden:YES];
+    [self.navController setNavigationBarHidden:YES];
+    [self.navController setDelegate:self];
+    [self.window setRootViewController:self.navController];
+    [self.window addSubview:self.navController.view];
+    [self.window makeKeyAndVisible];
     
-    if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
-    {
-        [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
-    }
+    
+    self.loginViewController = [[LoginViewController alloc] init];
+    //[_navController pushViewController: animated:NO];
+//    [self.navController presentViewController:self.loginViewController animated:YES completion:^{
+//    
+//        if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
+//        {
+//            [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
+//        }
+//    }];
+    
     
     return YES;
 }
@@ -990,6 +1020,10 @@
         assert(false);
         return;
     }
+    if ( channel >= [[CDeviceData shareDeviceData].channelTimerStatus count] )
+    {
+        return ;
+    }
     NSMutableData *data = [[NSMutableData alloc] init];
     NSString *strChannel = [NSString stringWithFormat:@"%2lu",(unsigned long)channel];
     [data appendData:[strChannel dataUsingEncoding:NSASCIIStringEncoding]];
@@ -1024,7 +1058,7 @@
     
 }
 
--(NSString *)ToHex:(long long int)tmpid
+- (NSString *)ToHex:(long long int)tmpid
 {
     NSString *nLetterValue;
     NSString *str =@"";
@@ -1138,5 +1172,20 @@
 - (void)didSetSysDateTime
 {
     [self.settingViewController didSetSysDateTime];
+}
+
+- (void)changePassword:(NSString*)password
+{
+    if ( [password length] != 4 )
+    {
+        assert(false);
+        return;
+    }
+    [self sendDataWithFunctionName:FUNCTION_NAME_CHANGE_PASSWORD data:[password dataUsingEncoding:NSASCIIStringEncoding]];
+}
+
+- (void)didChangePassword
+{
+    [self.changePasswordViewController didChangePassword];
 }
 @end
