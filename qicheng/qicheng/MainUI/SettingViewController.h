@@ -10,10 +10,11 @@
 
 @interface SettingViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
 {
-    UIDatePicker *_datePicker;
+    //UIDatePicker *_datePicker;
     UITableView *_settingTableView;
 }
 
 - (void)didClearCounter;
 - (void)didSetSysDateTime;
+- (void)didQuerySysDateTime;
 @end

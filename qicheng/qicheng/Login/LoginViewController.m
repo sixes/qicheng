@@ -69,7 +69,7 @@
     [self.view addGestureRecognizer:tgr];
     [tgr release];
     
-    _btnLogin           = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    _btnLogin           = [UIButton buttonWithType:UIButtonTypeCustom];
     _lblColon           = [[UILabel alloc] init];
     _lblLoginIp         = [[UILabel alloc] init];
     _lblModuleIdx       = [[UILabel alloc] init];
@@ -109,6 +109,7 @@
     [_textFieldIp setAdjustsFontSizeToFitWidth:YES];
     [_textFieldIp setLeftViewMode:UITextFieldViewModeAlways];
     [_textFieldIp setLeftView:_lblLoginIp];
+    _textFieldIp.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     _textFieldIp.borderStyle        = UITextBorderStyleRoundedRect;
     _textFieldIp.clearButtonMode    = UITextFieldViewModeWhileEditing;
     _textFieldIp.keyboardType       = UIKeyboardTypeASCIICapable;
@@ -142,6 +143,7 @@
     _textFieldPort.clearButtonMode       = UITextFieldViewModeWhileEditing;
     _textFieldPort.keyboardType          = UIKeyboardTypeDecimalPad;
     _textFieldPort.returnKeyType         = UIReturnKeyDone;
+    _textFieldPort.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     [_textFieldPort setDelegate:self];
     [_textFieldPort setLeftViewMode:UITextFieldViewModeAlways];
     [_textFieldPassword addTarget:self action:@selector(onPassWordDone:) forControlEvents:UIControlEventTouchDown];
@@ -170,6 +172,7 @@
     _textFieldModuleIdx.clearButtonMode       = UITextFieldViewModeWhileEditing;
     _textFieldModuleIdx.keyboardType          = UIKeyboardTypeDecimalPad;
     _textFieldModuleIdx.returnKeyType         = UIReturnKeyDone;
+    _textFieldModuleIdx.contentVerticalAlignment    = UIControlContentVerticalAlignmentCenter;
     [_textFieldModuleIdx setDelegate:self];
     [_textFieldModuleIdx setLeftView:_lblModuleIdx];
     [_textFieldModuleIdx setLeftViewMode:UITextFieldViewModeAlways];
@@ -199,6 +202,7 @@
     _textFieldPassword.clearButtonMode       = UITextFieldViewModeWhileEditing;
     _textFieldPassword.keyboardType          = UIKeyboardTypeDecimalPad;
     _textFieldPassword.returnKeyType         = UIReturnKeyDone;
+    _textFieldPassword.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     [_textFieldPassword setSecureTextEntry:YES];
     [_textFieldPassword setDelegate:self];
     [_textFieldPassword setLeftView:_lblPassword];

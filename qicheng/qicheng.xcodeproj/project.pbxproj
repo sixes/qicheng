@@ -13,6 +13,7 @@
 		EA1132D6183FC690007EA1AD /* MenuItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1132D5183FC690007EA1AD /* MenuItemView.m */; };
 		EA1132D8183FCB24007EA1AD /* scene.png in Resources */ = {isa = PBXBuildFile; fileRef = EA1132D7183FCB24007EA1AD /* scene.png */; };
 		EA1132DA183FCDE9007EA1AD /* main_home_room.png in Resources */ = {isa = PBXBuildFile; fileRef = EA1132D9183FCDE9007EA1AD /* main_home_room.png */; };
+		EA1184701854DA02008DFA46 /* SetDeviceNameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA11846F1854DA02008DFA46 /* SetDeviceNameViewController.m */; };
 		EA152237184650D7009771E1 /* general_back_normal.png in Resources */ = {isa = PBXBuildFile; fileRef = EA15222E184650D7009771E1 /* general_back_normal.png */; };
 		EA152238184650D7009771E1 /* general_back_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA15222F184650D7009771E1 /* general_back_pressed.png */; };
 		EA152239184650D7009771E1 /* home_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA152230184650D7009771E1 /* home_pressed.png */; };
@@ -78,6 +79,9 @@
 		EA1132D5183FC690007EA1AD /* MenuItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MenuItemView.m; path = MainUI/MenuItemView.m; sourceTree = "<group>"; };
 		EA1132D7183FCB24007EA1AD /* scene.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = scene.png; path = Resource/scene.png; sourceTree = "<group>"; };
 		EA1132D9183FCDE9007EA1AD /* main_home_room.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = main_home_room.png; path = Resource/main_home_room.png; sourceTree = "<group>"; };
+		EA11846D18544358008DFA46 /* UIConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UIConfig.h; sourceTree = "<group>"; };
+		EA11846E1854DA02008DFA46 /* SetDeviceNameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SetDeviceNameViewController.h; path = MainUI/SetDeviceNameViewController.h; sourceTree = "<group>"; };
+		EA11846F1854DA02008DFA46 /* SetDeviceNameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SetDeviceNameViewController.m; path = MainUI/SetDeviceNameViewController.m; sourceTree = "<group>"; };
 		EA15222E184650D7009771E1 /* general_back_normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = general_back_normal.png; path = Resource/general_back_normal.png; sourceTree = "<group>"; };
 		EA15222F184650D7009771E1 /* general_back_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = general_back_pressed.png; path = Resource/general_back_pressed.png; sourceTree = "<group>"; };
 		EA152230184650D7009771E1 /* home_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = home_pressed.png; path = Resource/home_pressed.png; sourceTree = "<group>"; };
@@ -192,6 +196,8 @@
 				EA1CBC7D184B1F56006C2E26 /* TimerViewController.m */,
 				EA1BD620184F8C0D00AAD9EF /* ChangePasswodViewController.h */,
 				EA1BD621184F8C0D00AAD9EF /* ChangePasswodViewController.m */,
+				EA11846E1854DA02008DFA46 /* SetDeviceNameViewController.h */,
+				EA11846F1854DA02008DFA46 /* SetDeviceNameViewController.m */,
 			);
 			name = MainUI;
 			sourceTree = "<group>";
@@ -200,6 +206,7 @@
 			isa = PBXGroup;
 			children = (
 				EA1C6CCB183A73C200F9C4D8 /* Config.h */,
+				EA11846D18544358008DFA46 /* UIConfig.h */,
 			);
 			name = Config;
 			sourceTree = "<group>";
@@ -462,6 +469,7 @@
 				EA1132D0183FC215007EA1AD /* DeviceData.m in Sources */,
 				EA1CBC7E184B1F56006C2E26 /* TimerViewController.m in Sources */,
 				EA1BD622184F8C0D00AAD9EF /* ChangePasswodViewController.m in Sources */,
+				EA1184701854DA02008DFA46 /* SetDeviceNameViewController.m in Sources */,
 				EAA8E9C7184A4BA5003F77B5 /* SettingViewController.m in Sources */,
 				EA203AFB183133F4000B08C3 /* AppDelegate.m in Sources */,
 				EA1132D1183FC215007EA1AD /* LoginInfo.m in Sources */,
@@ -549,8 +557,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				ONLY_ACTIVE_ARCH = YES;
-				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
+				ONLY_ACTIVE_ARCH = NO;
+				PROVISIONING_PROFILE = "AA3806DD-5C0F-463E-B10A-BF2A1F97277F";
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -585,7 +593,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
+				PROVISIONING_PROFILE = "AA3806DD-5C0F-463E-B10A-BF2A1F97277F";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "armv7 armv7s";
@@ -605,7 +613,8 @@
 				INFOPLIST_FILE = "qicheng/qicheng-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
+				PROVISIONING_PROFILE = "AA3806DD-5C0F-463E-B10A-BF2A1F97277F";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
@@ -624,7 +633,8 @@
 				INFOPLIST_FILE = "qicheng/qicheng-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "743F5FF3-655C-461F-BCC8-E3AA816E5326";
+				PROVISIONING_PROFILE = "AA3806DD-5C0F-463E-B10A-BF2A1F97277F";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};

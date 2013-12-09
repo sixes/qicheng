@@ -124,15 +124,47 @@
     
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        return 100.0;
+    }
+    else
+    {
+        return 40.0;
+    }
+}
+
 - (void)loadView
 {
     _timerTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height) style:UITableViewStyleGrouped];
     self.view = _timerTableView;
     //[self.view setFrame:CGRectMake(0, 80, 320, 640)];
     
+    CGRect btnOpenRt,btnDoneRt,btnCancelRt,btnNextRt,lblTitleRt;
+    CGRect datePickerRt;
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        btnOpenRt       = CGRectMake(0, 0, 200, 60);
+        btnDoneRt       = CGRectMake(580, 0, 200, 60);
+        btnCancelRt     = CGRectMake(0, 0, 200, 60);
+        btnNextRt       = CGRectMake(580,0,200,60);
+        datePickerRt    = CGRectMake(0, 600, [AppDelegate shareAppDelegate].width, 800);
+        lblTitleRt      = CGRectMake(350, 0, 100, 30);
+    }
+    else
+    {
+        btnOpenRt       = CGRectMake(0, 0, 100, 30);
+        btnDoneRt       = CGRectMake(220, 0, 100, 30);
+        btnCancelRt     = CGRectMake(0, 0, 100, 30);
+        btnNextRt       = CGRectMake(220, 0, 100, 30);
+        datePickerRt    = CGRectMake(0, 230, 320, 120);
+        lblTitleRt      = CGRectMake(150, 0, 100, 30);
+    }
     [_timerTableView setDataSource:self];
     [_timerTableView setDelegate:self];
-    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,80, 320, 30)];
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,80,[AppDelegate shareAppDelegate].width, 30)];
     header.userInteractionEnabled = YES;
 //    _timerTableView.tableHeaderView = [[UIView alloc] init];
 //    [_timerTableView.tableHeaderView setIsAccessibilityElement:YES];
@@ -140,15 +172,15 @@
     _timerTableView.tableHeaderView = header;
     [header release];
     
-    UIView *footer = [[UIView alloc] initWithFrame:CGRectMake(0, 800, 320, 30)];
+    UIView *footer = [[UIView alloc] initWithFrame:CGRectMake(0, 750, 320, 30)];
     footer.userInteractionEnabled = YES;
     _timerTableView.tableFooterView = footer;
     
-    _btnCancel  = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
-    _lblTitle   = [[UILabel alloc] initWithFrame:CGRectMake(150, 0, 100, 30)];
-    _btnDone    = [[UIButton alloc] initWithFrame:CGRectMake(250, 0, 100, 30)];
-    _btnNext    = [[UIButton alloc] initWithFrame:CGRectMake(220, 0, 100, 30)];
-    _btnOpen    = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
+    _btnCancel  = [[UIButton alloc] initWithFrame:btnCancelRt];
+    _lblTitle   = [[UILabel alloc] initWithFrame:lblTitleRt];
+    _btnDone    = [[UIButton alloc] initWithFrame:btnDoneRt];
+    _btnNext    = [[UIButton alloc] initWithFrame:btnNextRt];
+    _btnOpen    = [[UIButton alloc] initWithFrame:btnOpenRt];
     
     [_timerTableView.tableHeaderView addSubview:_btnOpen];
     [_timerTableView.tableHeaderView addSubview:_lblTitle];
@@ -161,7 +193,7 @@
     //UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:@"test"];
     //[[AppDelegate shareAppDelegate].navController.navigationBar pushNavigationItem:item animated:YES];
     
-    _datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 230, 320, 120)];
+    _datePicker = [[UIDatePicker alloc] initWithFrame:datePickerRt];
     [_datePicker setHidden:YES];
     _datePicker.datePickerMode = UIDatePickerModeTime;
     _datePicker.locale = [NSLocale systemLocale];
@@ -180,6 +212,8 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
+    [_lblTitle setBackgroundColor:[UIColor clearColor]];
+
     
     [_btnDone setTitle:@"完成" forState:UIControlStateNormal];
     [_btnDone setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];

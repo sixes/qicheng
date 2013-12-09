@@ -26,8 +26,23 @@
         _imgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
         [self addSubview:_imgView];
 
-        _lbl = [[UILabel alloc] initWithFrame:CGRectMake(0,frame.size.height -25,frame.size.width,20)];
-        [_lbl setFont:[UIFont boldSystemFontOfSize:20.0]];
+        CGFloat lblH = 0.0;
+        CGFloat fontSize = 0.0;
+        if ( [AppDelegate shareAppDelegate].biPad )
+        {
+            lblH = 40.0;
+            fontSize = 40.0;
+        }
+        else
+        {
+            lblH = 20.0;
+            fontSize = 20.0;
+        }
+    
+        _lbl = [[UILabel alloc] initWithFrame:CGRectMake(0,frame.size.height - lblH - 5,frame.size.width,lblH)];
+
+       
+        [_lbl setFont:[UIFont boldSystemFontOfSize:fontSize]];
         [_lbl setTextAlignment:NSTextAlignmentCenter];
         [_lbl setTextColor:[UIColor whiteColor]];
         [_lbl setBackgroundColor:[UIColor clearColor]];
@@ -63,9 +78,9 @@
 
 - (void)dealloc
 {
-    [super dealloc];
     [_lbl release];
     [_imgView release];
+    [super dealloc];
 }
 /*
 // Only override drawRect: if you perform custom drawing.

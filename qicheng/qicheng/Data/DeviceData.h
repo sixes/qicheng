@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-static const NSString* CURTAIN_OPEN_NAME = @"开启";
-static const NSString* CURTAIN_STOP_NAME = @"关闭";
-static const NSString* CURTAIN_CLOSE_NAME = @"停";
+static NSString* const CURTAIN_OPEN_NAME = @"开启";
+static NSString* const CURTAIN_STOP_NAME = @"关闭";
+static NSString* const CURTAIN_CLOSE_NAME = @"停";
 
 @interface CDeviceData : NSObject
 {
@@ -59,7 +59,7 @@ static const NSString* CURTAIN_CLOSE_NAME = @"停";
 @property (nonatomic,retain) NSMutableArray *sensorStatus;
 @property (nonatomic,copy) NSString *curtainStatus;
 @property (nonatomic,copy) NSString *originalSysDateTime;
-@property (nonatomic,assign) NSDate *sysDateTime;
+@property (nonatomic,retain) NSDate *sysDateTime;
 
 
 @property (nonatomic,copy) NSString *loginDomain;

@@ -26,6 +26,14 @@
 
     UIButton *_btnBack2Main;
     UIButton *_btnBack;
+    
+   // NSTimer *_sensorTimer;
+    NSTimer *_tempTimer;
+    
+    BOOL _bHadQuerySensorStatus;
+    BOOL _bHadQueryAlarmCount;
+    BOOL _bHadQueryTimerStatus;
+    BOOL _bHadQueryRelayStatus;
 }
 
 @property (nonatomic,assign) BOOL bFilpped;

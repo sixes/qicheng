@@ -9,6 +9,7 @@
 #import "MainUIViewController.h"
 #import "AppDelegate.h"
 #import "MenuItemView.h"
+#import "UIConfig.h"
 
 @interface MainUIViewController ()
 
@@ -40,28 +41,68 @@
     [self.view setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
     self.view.userInteractionEnabled = YES;
     
+    CGFloat firstItemX,firstItemY;
+    CGFloat secItemX,secItemY;
+    CGFloat hGap;
+    CGFloat menuItemW,menuItemH;
+    if ( YES == [AppDelegate shareAppDelegate].biPad )
+    {
+        firstItemX  = FIRST_MENU_ITEM_X_IPAD;
+        firstItemY  = FIRST_MENU_ITEM_Y_IPAD;
+        hGap        = H_GAP_IPAD;
+        menuItemW   = MAIN_UI_MENU_ITEM_WIDTH_IPAD;
+        menuItemH   = MAIN_UI_MENU_ITEM_HEIGHT_IPAD;
+        secItemX    = SECOND_MENU_ITEM_X_IPAD;
+        secItemY    = SECOND_MENU_ITEM_Y_IPAD;
+    }
+    else
+    {
+        firstItemX  = FIRST_MENU_ITEM_X_IPHONE;
+        firstItemY  = FIRST_MENU_ITEM_Y_IPHONE;
+        hGap        = H_GAP_IPHONE;
+        menuItemW   = MAIN_UI_MENU_ITEM_WIDTH_IPHONE;
+        menuItemH   = MAIN_UI_MENU_ITEM_HEIGHT_IPHONE;
+        secItemX    = SECOND_MENU_ITEM_X_IPHONE;
+        secItemY    = SECOND_MENU_ITEM_Y_IPHONE;
+    }
+    
+    CGRect item1Rect = CGRectMake(firstItemX,firstItemY, menuItemW,menuItemH );
+    CGRect item3Rect = CGRectMake(firstItemX,firstItemY + item1Rect.size.height + hGap, menuItemW, menuItemH );
+    CGRect item5Rect = CGRectMake(firstItemX,firstItemY + item1Rect.size.height + item3Rect.size.height + hGap * 2, menuItemW, menuItemH );
+    
+
+    CGRect item2Rect = CGRectMake(secItemX, secItemY, menuItemW, menuItemH);
+    CGRect item4Rect = CGRectMake(secItemX, secItemY + item2Rect.size.height + hGap, menuItemW, menuItemH );
+    
+    
     UIImage *img1 = [UIImage imageNamed:@"scene.png"];
-    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 40, 130, 130) image:img1 menuName:@"场景" menuItemType:0 dispatchEvent:YES];
+    MenuItemView *item1 = [[MenuItemView alloc] initWithFrame:item1Rect image:img1 menuName:@"场景" menuItemType:0 dispatchEvent:YES];
     [self.view addSubview:item1];
     [item1 release];
     
     UIImage *img2 = [UIImage imageNamed:@"main_home_room.png"];
 //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
-    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 40, 130, 130) image:img2 menuName:@"区域" menuItemType:1 dispatchEvent:YES];
+    MenuItemView *item2 = [[MenuItemView alloc] initWithFrame:item2Rect image:img2 menuName:@"区域" menuItemType:1 dispatchEvent:YES];
     [self.view addSubview:item2];
     [item2 release];
     
     UIImage *img3 = [UIImage imageNamed:@"main_home_devices.png"];
     //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
-    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:CGRectMake(10, 170, 130, 130) image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:YES];
+    MenuItemView *item3 = [[MenuItemView alloc] initWithFrame:item3Rect image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:YES];
     [self.view addSubview:item3];
     [item3 release];
     
     UIImage *img4 = [UIImage imageNamed:@"main_home_system.png"];
     //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
-    MenuItemView *item4 = [[MenuItemView alloc] initWithFrame:CGRectMake(150, 170, 130, 130) image:img4 menuName:@"系统" menuItemType:3 dispatchEvent:YES];
+    MenuItemView *item4 = [[MenuItemView alloc] initWithFrame:item4Rect image:img4 menuName:@"系统" menuItemType:3 dispatchEvent:YES];
     [self.view addSubview:item4];
     [item4 release];
+    
+    UIImage *img5 = [UIImage imageNamed:@"main_home_system.png"];
+    //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
+    MenuItemView *item5 = [[MenuItemView alloc] initWithFrame:item5Rect image:img5 menuName:@"注销" menuItemType:4 dispatchEvent:YES];
+    [self.view addSubview:item5];
+    [item5 release];
 }
 
 - (void)onTapMenuItemWithType:(NSUInteger)type
@@ -96,6 +137,11 @@
             }
             [[AppDelegate shareAppDelegate].navController setNavigationBarHidden:NO animated:YES];
             [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].settingViewController animated:YES];
+        }
+        break;
+        case 4:
+        {
+            [[AppDelegate shareAppDelegate] logout];
         }
         break;
         default:

@@ -15,6 +15,7 @@
 #import "MainUIViewController.h"
 #import "SceneViewController.h"
 #import "SettingViewController.h"
+#import "SetDeviceNameViewController.h"
 #import "TimerViewController.h"
 #import "ChangePasswodViewController.h"
 
@@ -26,6 +27,7 @@
     LoginViewController *_loginViewController;
     MainUIViewController *_mainUIViewController;
     SceneViewController *_sceneViewController;
+    SetDeviceNameViewController *_setDeviceNameViewController;
     SettingViewController *_settingViewController;
     TimerViewController *_timerViewController;
     
@@ -39,8 +41,11 @@
     NSCharacterSet * _recvTailSet;
     
     UINavigationController *_navController;
+    
+    BOOL _biPad;
 }
 
+@property (nonatomic,assign) BOOL biPad;
 @property (assign) CGFloat height;
 @property (assign) CGFloat width;
 @property (nonatomic,retain) NSMutableData *readData;
@@ -50,6 +55,7 @@
 @property (nonatomic,assign) MainUIViewController *mainUIViewController;
 @property (nonatomic,assign) UINavigationController *navController;
 @property (nonatomic,assign) SceneViewController *sceneViewController;
+@property (nonatomic,assign) SetDeviceNameViewController    *setDeviceNameViewController;
 @property (nonatomic,assign) SettingViewController *settingViewController;
 @property (nonatomic,assign) TimerViewController *timerViewController;
 
@@ -103,4 +109,6 @@
 - (void)didReceiveDataWithFunctionName:(NSString *)name data:(NSString *)aData;
 
 - (NSString *)ToHex:(long long int)tmpid;
+
+- (void)logout;
 @end

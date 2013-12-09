@@ -12,6 +12,8 @@
 #import "MenuItemView.h"
 #import "DeviceData.h"
 #import "Config.h"
+#import "UIConfig.h"
+
 @interface FunctionViewController ()
 
 @end
@@ -30,9 +32,22 @@
     [self.view setFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
     [self.view setUserInteractionEnabled:YES];
     
-    _tableView = [[UITableView alloc] initWithFrame:CGRectMake(30, 40, 260, 300) style:UITableViewStylePlain];
+    CGRect tableRect;
+    CGRect iCarouselRect;
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        iCarouselRect = CGRectMake(0, 600, [AppDelegate shareAppDelegate].width, 400 );
+        tableRect = CGRectMake(80, 80, [AppDelegate shareAppDelegate].width - 160, 500 );
+    }
+    else
+    {
+        iCarouselRect = CGRectMake(0, 280,[AppDelegate shareAppDelegate].width, 220);
+        tableRect = CGRectMake(30, 40, [AppDelegate shareAppDelegate].width - 40, 250);
+    }
+    _tableView = [[UITableView alloc] initWithFrame:tableRect style:UITableViewStylePlain];
     [_tableView setDataSource:self];
     [_tableView setDelegate:self];
+    [_tableView setSeparatorStyle:UITableViewCellSeparatorStyleSingleLine];
     [_tableView setBackgroundColor:[UIColor clearColor]];
     [self.view addSubview:_tableView];
     
@@ -43,7 +58,7 @@
         [_items addObject:[NSNumber numberWithInt:i]];
     }
     
-    _carousel = [[iCarousel alloc] initWithFrame:CGRectMake(0, 310, 320, 220)];
+    _carousel = [[iCarousel alloc] initWithFrame:iCarouselRect];
    // _carousel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _carousel.type = iCarouselTypeCoverFlow2;
     _carousel.delegate = self;
@@ -69,7 +84,21 @@
     UIImage *back2MainImagePressed = [UIImage imageWithContentsOfFile:pressedPath];
     [_btnBack2Main setBackgroundImage:back2MainImage forState:UIControlStateNormal];
     [_btnBack2Main setBackgroundImage:back2MainImagePressed forState:UIControlStateHighlighted];
-    [_btnBack2Main setFrame:CGRectMake(0,0,back2MainImage.size.width,back2MainImage.size.height)];
+    CGFloat h;
+    CGFloat imgW,imgH;
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        h = 0;
+        imgW = back2MainImage.size.width;
+        imgH = back2MainImage.size.height;
+    }
+    else
+    {
+        h = 20;
+        imgW = back2MainImage.size.width / 2;
+        imgH = back2MainImage.size.height / 2;
+    }
+    [_btnBack2Main setFrame:CGRectMake(0,h,imgW,imgH)];
     [_btnBack2Main addTarget:self action:@selector(onTapBack2Main) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_btnBack2Main];
 
@@ -83,6 +112,11 @@
     [_btnBack addTarget:self action:@selector(onTapBack) forControlEvents:UIControlEventTouchUpInside];
     [_btnBack setHidden:YES];
     [self.view addSubview:_btnBack];
+    
+    _bHadQueryAlarmCount    = NO;
+    _bHadQueryRelayStatus   = NO;
+    _bHadQuerySensorStatus  = NO;
+    _bHadQueryTimerStatus   = NO;
 }
 
 - (void)onTapBack2Main
@@ -120,6 +154,18 @@
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return YES;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        return 100.0;
+    }
+    else
+    {
+        return 40.0;
+    }
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -181,13 +227,32 @@
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 break;
         }
+        cell.backgroundColor = [UIColor clearColor];
+        [cell.detailTextLabel setTextColor:[UIColor yellowColor]];
+        [cell.textLabel setTextColor:[UIColor yellowColor]];
+        CGFloat fontSz;
+        CGRect swRt;
+        if ( [AppDelegate shareAppDelegate].biPad )
+        {
+            swRt    = CGRectMake(0, 0, 300, 40);
+            fontSz  = 30.0;
+        }
+        else
+        {
+            swRt    = CGRectMake(0, 0, 40, 30);
+            fontSz  = 15.0;
+        }
+        [cell.detailTextLabel setFont:[UIFont systemFontOfSize:fontSz]];
+        [cell.textLabel setFont:[UIFont systemFontOfSize:fontSz]];
+        UISwitch *sw = [[UISwitch alloc] initWithFrame:swRt];
         
-        UISwitch *sw = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 40, 30)];
-        sw.tag = [indexPath row];
         [sw addTarget:self action:@selector(updateSwitchAtIndexPath:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = sw;
         [sw release];
     }
+    UISwitch *sw = (UISwitch*)cell.accessoryView;
+    sw.tag = [indexPath row];
+    
     switch ( _currentIdx )
     {
         case 0:
@@ -373,17 +438,36 @@
 
 - (void)loadCurtainView
 {
-    _curtainView = [[UIView alloc] initWithFrame:CGRectMake(30, 40, 260, 300)];
+    CGRect viewRt;
+    CGRect imgRt;
+    CGRect btnOpenRt,btnStopRt,btnCloseRt;
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        btnOpenRt   = CGRectMake(100, 450, 100, 100);
+        btnStopRt   = CGRectMake(240, 450, 100, 100);
+        btnCloseRt  = CGRectMake(380, 450, 100, 100);
+        imgRt       = CGRectMake(60, 0, 450, 450);
+        viewRt      = CGRectMake(80, 80, 600, 600);
+    }
+    else
+    {
+        btnOpenRt   = CGRectMake(35, 250, 60, 60);
+        btnStopRt   = CGRectMake(185, 250, 60, 60);
+        btnCloseRt  = CGRectMake(110, 250, 60, 60);
+        imgRt       = CGRectMake(20, 0, 220, 250);
+        viewRt      = CGRectMake(30, 40, 260, 300);
+    }
+    _curtainView = [[UIView alloc] initWithFrame:viewRt];
     UIImage *img = [UIImage imageNamed:@"device_shade_bg.png"];
     UIImageView *_imgView = [[UIImageView alloc] initWithImage:img];
-    [_imgView setFrame:CGRectMake(20, 0, 220, 250)];
+    [_imgView setFrame:imgRt];
     [_curtainView addSubview:_imgView];
     [_imgView release];
     
-    _curtainAnimationView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 0, 220, 250)];
+    _curtainAnimationView = [[UIImageView alloc] initWithFrame:imgRt];
    
     
-    UIButton *btnOpen = [[UIButton alloc] initWithFrame:CGRectMake(35, 250, 60, 60)];
+    UIButton *btnOpen = [[UIButton alloc] initWithFrame:btnOpenRt];
     UIImage *btnOpenImg = [UIImage imageNamed:@"device_stop_pressed.png"];
     
     [btnOpen setTitle:CURTAIN_OPEN_NAME forState:UIControlStateNormal];
@@ -396,7 +480,7 @@
     [btnOpen release];
 
     
-    UIButton *btnStop = [[UIButton alloc] initWithFrame:CGRectMake(185, 250, 60, 60)];
+    UIButton *btnStop = [[UIButton alloc] initWithFrame:btnCloseRt];
     UIImage *btnStopImg = [UIImage imageNamed:@"device_stop_pressed.png"];
     [btnStop setBackgroundImage:btnStopImg forState:UIControlStateNormal];
     [btnStop setTitle:CURTAIN_STOP_NAME forState:UIControlStateNormal];
@@ -404,7 +488,8 @@
     [_curtainView addSubview:btnStop];
     [btnStop release];
     
-    UIButton *btnClose = [[UIButton alloc] initWithFrame:CGRectMake(110, 250, 60, 60)];
+    
+    UIButton *btnClose = [[UIButton alloc] initWithFrame:btnStopRt];
     UIImage *btnCloseImg = [UIImage imageNamed:@"device_stop_pressed.png"];
     [btnClose setBackgroundImage:btnCloseImg forState:UIControlStateNormal];
     [btnClose setTitle:CURTAIN_CLOSE_NAME forState:UIControlStateNormal];
@@ -482,6 +567,11 @@
     
 }
 
+- (BOOL)carouselShouldWrap:(iCarousel *)carousel
+{
+    return YES;
+}
+
 - (NSUInteger) numberOfItemsInCarousel:(iCarousel *)carousel
 {
     return [_items count];
@@ -489,12 +579,70 @@
 
 - (NSUInteger) numberOfVisibleItemsInCarousel:(iCarousel *)carousel
 {
-    return [_items count];
+    return 3;//[_items count];
+}
+
+- (void)onSensorTimer
+{
+    [[AppDelegate shareAppDelegate] queryAllSensorStatus];
+}
+
+- (void)onTempTimer
+{
+    [[AppDelegate shareAppDelegate] queryTemperature];
 }
 
 - (void)onTapIndex:(NSUInteger)index
 {
     _currentIdx = index;
+    if ( 1 == index )
+    {
+        if ( NO == _bHadQueryRelayStatus )
+        {
+            [[AppDelegate shareAppDelegate] queryAllRelayStatus];
+            _bHadQueryRelayStatus = YES;
+        }
+    }
+    else if ( 2 == index )
+    {
+        if ( NO == _bHadQuerySensorStatus )
+        {
+            [self onSensorTimer];
+            _bHadQuerySensorStatus = YES;
+        }
+    }
+    else if ( 3 == index )
+    {
+        if ( NO == _bHadQueryAlarmCount )
+        {
+            [[AppDelegate shareAppDelegate] queryAllAlarmCount];
+            [[AppDelegate shareAppDelegate] queryAlarmIsOpen];
+            _bHadQueryAlarmCount = YES;
+        }
+    }
+    else if ( 5 == index )
+    {
+        if ( NO == _bHadQueryTimerStatus )
+        {
+            [[AppDelegate shareAppDelegate] queryAllTimerStatus];
+            _bHadQueryTimerStatus = YES;
+        }
+    }
+    if ( 4 == index )
+    {
+        if ( nil == _tempTimer )
+        {
+            _tempTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTempTimer) userInfo:nil repeats:YES];
+        }
+    }
+    else
+    {
+        if ( _tempTimer )
+        {
+            [_tempTimer invalidate];
+            _tempTimer = nil;
+        }
+    }
     switch ( index )
     {
         case 0:
@@ -502,7 +650,12 @@
  
         }
         break;
+        //sensor
+        case 2:
+        {
             
+        }
+        break;
         default:
             break;
     }
@@ -511,6 +664,19 @@
         [self onTapBack];
     }
     [_tableView reloadData];
+}
+
+- (CGFloat)carouselItemWidth:(iCarousel *)carousel
+{
+    //slightly wider than item view
+    if ( [AppDelegate shareAppDelegate].biPad )
+    {
+        return 400.0;
+    }
+    else
+    {
+        return 180.0;
+    }
 }
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index
@@ -526,7 +692,7 @@
 
 - (UIView*) carousel:(iCarousel *)carousel viewForItemAtIndex:(NSUInteger)index reusingView:(UIView *)view
 {
-    UILabel *label = nil;
+//    UILabel *label = nil;
 	
 	//create new view if no view is available for recycling
 	if (view == nil)
@@ -540,7 +706,16 @@
 //		[view addSubview:label];
         UIImage *img3 = [UIImage imageNamed:@"main_home_devices.png"];
         //    NSLog(@"screen w:%f",[[UIScreen mainScreen] bounds].size.width);
-        view = [[[MenuItemView alloc] initWithFrame:CGRectMake(10, 150, 130, 130) image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:NO] autorelease];
+        CGRect rect;
+        if ( [AppDelegate shareAppDelegate].biPad )
+        {
+            rect = CGRectMake(0, 0, MAIN_UI_MENU_ITEM_WIDTH_IPAD, MAIN_UI_MENU_ITEM_HEIGHT_IPAD );
+        }
+        else
+        {
+            rect = CGRectMake(10, 150, 130, 130);
+        }
+        view = [[[MenuItemView alloc] initWithFrame:rect image:img3 menuName:@"功能" menuItemType:2 dispatchEvent:NO] autorelease];
        
 	}
 	else
@@ -667,38 +842,48 @@
 
 - (void)didOpenCurtain
 {
-    UIImage *imgOn = [UIImage imageNamed:@"device_control_shade_on.png"];
-    //UIImage *imgOff = [UIImage imageNamed:@"device_control_shade_off.png"];
-    //UIImage *imgMid = [UIImage imageNamed:@"device_control_shade_mid.png"];
-    //_curtainAnimationView.animationImages = [NSArray arrayWithObjects:imgOn,imgMid,imgOff,nil];
-    //[_curtainAnimationView setAnimationDuration:2.0];
-    //[_curtainAnimationView setAnimationRepeatCount:1];
-    //[_curtainAnimationView startAnimating];
+//    UIImage *imgOn = [UIImage imageNamed:@"device_control_shade_on.png"];
+//    //UIImage *imgOff = [UIImage imageNamed:@"device_control_shade_off.png"];
+//    //UIImage *imgMid = [UIImage imageNamed:@"device_control_shade_mid.png"];
+//    //_curtainAnimationView.animationImages = [NSArray arrayWithObjects:imgOn,imgMid,imgOff,nil];
+//    //[_curtainAnimationView setAnimationDuration:2.0];
+//    //[_curtainAnimationView setAnimationRepeatCount:1];
+//    //[_curtainAnimationView startAnimating];
+//    
+//    [_curtainAnimationView setImage:imgOn];
+//    CATransition *animation = [CATransition animation];
+//    animation.delegate = self;
+//    animation.duration = 1;
+//    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+//    // 设定动画类型
+//    // kCATransitionFade 淡化
+//    // kCATransitionPush 推挤
+//    // kCATransitionReveal 揭开
+//    // kCATransitionMoveIn 覆盖
+//    // @"cube" 立方体
+//    // @"suckEffect" 吸收
+//    // @"oglFlip" 翻转
+//    // @"rippleEffect" 波纹
+//    // @"pageCurl" 翻页
+//    // @"pageUnCurl" 反翻页
+//    // @"cameraIrisHollowOpen" 镜头开
+//    // @"cameraIrisHollowClose" 镜头关
+//    animation.type = @"spewEffect";
+//    animation.subtype = kCATransitionFromRight;
+//
+//    [_curtainView addSubview:_curtainAnimationView];
+//    [[_curtainView layer] addAnimation:animation forKey:@"animation"];
+
     
-    [_curtainAnimationView setImage:imgOn];
     CATransition *animation = [CATransition animation];
-    animation.delegate = self;
-    animation.duration = 1;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
-    // 设定动画类型
-    // kCATransitionFade 淡化
-    // kCATransitionPush 推挤
-    // kCATransitionReveal 揭开
-    // kCATransitionMoveIn 覆盖
-    // @"cube" 立方体
-    // @"suckEffect" 吸收
-    // @"oglFlip" 翻转
-    // @"rippleEffect" 波纹
-    // @"pageCurl" 翻页
-    // @"pageUnCurl" 反翻页
-    // @"cameraIrisHollowOpen" 镜头开
-    // @"cameraIrisHollowClose" 镜头关
-    animation.type = @"suckEffect";
-    animation.subtype = kCATransitionFromRight;
+    [animation setDuration:1.0f];
+    [animation setFillMode:kCAFillModeBoth];
+    [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+    [animation setType:@"suckEffect"];
+    [_curtainView.layer addAnimation:animation forKey:nil];
 
-    [_curtainView addSubview:_curtainAnimationView];
-    [[_curtainView layer] addAnimation:animation forKey:@"animation"];
-
+    
+    
     [CDeviceData shareDeviceData].curtainStatus = FUNCTION_NAME_OPEN_CURTAIN;
     [_tableView reloadData];
 }

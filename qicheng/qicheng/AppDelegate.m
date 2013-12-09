@@ -14,6 +14,7 @@
 
 @implementation AppDelegate
 
+@synthesize biPad       = _biPad;
 @synthesize height      = _height;
 @synthesize readData    = _readData;
 @synthesize width       = _width;
@@ -23,6 +24,7 @@
 @synthesize mainUIViewController    = _mainUIViewController;
 @synthesize navController           = _navController;
 @synthesize sceneViewController     = _sceneViewController;
+@synthesize setDeviceNameViewController = _setDeviceNameViewController;
 @synthesize settingViewController   = _settingViewController;
 @synthesize timerViewController     = _timerViewController;
 
@@ -34,7 +36,8 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-    if ( viewController != _settingViewController && viewController != _timerViewController && viewController != _changePasswordViewController )
+    if ( viewController != _settingViewController && viewController != _timerViewController && viewController != _changePasswordViewController &&
+        viewController != _setDeviceNameViewController )
     {
         NSLog(@"hide bar");
         [navigationController setNavigationBarHidden:YES animated:YES];
@@ -54,7 +57,7 @@
         NSError *error;
        // [_socket connectToHost:@"192.168.1.254" withTimeout:2 onPort:50000 error:&error];
         
-        [_socket connectToHost:loginIp onPort:[port intValue] withTimeout:2 error:&error];
+        [_socket connectToHost:loginIp onPort:[port intValue] withTimeout:10 error:&error];
         [_socket setRunLoopModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
     }
     return YES;
@@ -103,7 +106,7 @@
     }
     [_socket readDataWithTimeout:-1 tag:0];
     
-    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginIp forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_IP];
+    [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginIp forKey:USER_DEFAULT_KEY_LOGIN_IP];
     [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPort forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PORT];
     [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginModuleIdx forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_MODULEINDEX];
     [[NSUserDefaults standardUserDefaults] setObject:(id)[CLoginInfo shareLoginInfo].loginPassword forKey:(NSString*)USER_DEFAULT_KEY_LOGIN_PASSWORD];
@@ -115,18 +118,19 @@
     
     //这里登录后的6个必查状态的发送请求，现在间隔必须在1秒多以上，不然设备不会返回数据
     //用tcp & upd debug查看过数据，发送的6个数据都可以正确地接收到。
-    [NSTimer scheduledTimerWithTimeInterval:0.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:3.4 target:self selector:@selector(querySysDateTime) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:4.6 target:self selector:@selector(queryAllRelayStatus) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:5.8 target:self selector:@selector(queryAllTimerStatus) userInfo:nil repeats:NO];
-    [NSTimer scheduledTimerWithTimeInterval:6.0 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
+    //[NSTimer scheduledTimerWithTimeInterval:0.0 target:self selector:@selector(queryAllAlarmCount) userInfo:nil repeats:NO];
+    //[NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(queryAlarmIsOpen) userInfo:nil repeats:NO];
+    //[NSTimer scheduledTimerWithTimeInterval:3.4 target:self selector:@selector(querySysDateTime) userInfo:nil repeats:NO];
+    //[NSTimer scheduledTimerWithTimeInterval:4.6 target:self selector:@selector(queryAllRelayStatus) userInfo:nil repeats:NO];
+    //[NSTimer scheduledTimerWithTimeInterval:5.8 target:self selector:@selector(queryAllTimerStatus) userInfo:nil repeats:NO];
+    //[NSTimer scheduledTimerWithTimeInterval:6.0 target:self selector:@selector(queryAllSensorStatus) userInfo:nil repeats:NO];
     
     [[AppDelegate shareAppDelegate].loginViewController didLoginSuccess];
     
    // [_navController dismissViewControllerAnimated:YES completion:NULL];
 //    [_navController.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
    // [_navController popToRootViewControllerAnimated:YES];
+    
 };
 
 - (void)onSocket:(AsyncSocket *)sock didWriteDataWithTag:(long)tag
@@ -198,10 +202,11 @@
             {
                 self.loginViewController = [[LoginViewController alloc] init];
             }
+            
             if ( NO == [self.navController.viewControllers containsObject:self.loginViewController] )
             {
                 //[self.navController pushViewController:self.loginViewController animated:YES];
-                [self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
+                //[self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
             }
             else
             {
@@ -231,6 +236,11 @@
 
                     NSLog(@"device date:%@",[dateFormatter stringFromDate:destDate]);    
                     [dateFormatter release];
+                    [CDeviceData shareDeviceData].sysDateTime = destDate;
+                    if ( self.settingViewController )
+                    {
+                        [self.settingViewController didQuerySysDateTime];
+                    }
                 }
                 else
                 {
@@ -337,7 +347,7 @@
                         for (int j = 0 ; j != 5; ++j)
                         {
                             int openTheDevice = 0;
-                            if ( [[msg substringWithRange:NSMakeRange(1 + 26 * i + j, 1)] intValue] > 0 )
+                            if ( [[msg substringWithRange:NSMakeRange(1 + 26 * i + j * 5, 1)] intValue] > 0 )
                             {
                                 openTheDevice = 1;
                             }
@@ -375,9 +385,9 @@
                     
                     NSUInteger value = strtoul([[msg substringWithRange:NSMakeRange(0,LENGTH_QUERY_ALL_SENSOR_STATUS)] UTF8String],0,16);   
                     NSUInteger sensor0status = value & ( 1 );
-                    NSUInteger sensor1status = value & ( 1 << 2 );
-                    NSUInteger sensor2status = value & ( 1 << 3 );
-                    NSUInteger sensor3status = value & ( 1 << 4 );
+                    NSUInteger sensor1status = value & ( 1 << 1 );
+                    NSUInteger sensor2status = value & ( 1 << 2 );
+                    NSUInteger sensor3status = value & ( 1 << 3 );
                     
                     [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor0status] atIndexedSubscript:0];
                     [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor1status] atIndexedSubscript:1];
@@ -879,8 +889,18 @@
         exit(0);
     }
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    if ( UIUserInterfaceIdiomPad == [[UIDevice currentDevice] userInterfaceIdiom] )
+    {
+        self.biPad = YES;
+    }
+    else
+    {
+        self.biPad = NO;
+    }
     _width  = [[UIScreen mainScreen] bounds].size.width;
     _height = [[UIScreen mainScreen] bounds].size.height;
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+//    _height = [[UIScreen mainScreen] applicationFrame].size.height;
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor blackColor];
     
@@ -904,13 +924,13 @@
     
     self.loginViewController = [[LoginViewController alloc] init];
     //[_navController pushViewController: animated:NO];
-//    [self.navController presentViewController:self.loginViewController animated:YES completion:^{
-//    
-//        if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
-//        {
-//            [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
-//        }
-//    }];
+    [self.navController presentViewController:self.loginViewController animated:NO completion:^{
+    
+        if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
+        {
+           //x [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
+        }
+    }];
     
     
     return YES;
@@ -966,7 +986,7 @@
 
 - (void)openRelayAtIndex:(NSUInteger)index
 {
-    NSString *str = [NSString stringWithFormat:@"%2lu",(unsigned long)index];
+    NSString *str = [NSString stringWithFormat:@"%02lu",(unsigned long)index];
     NSData *data = [str dataUsingEncoding:NSASCIIStringEncoding];
     [self sendDataWithFunctionName:FUNCTION_NAME_OPEN_RELAY data:data];
 }
@@ -978,7 +998,7 @@
 
 - (void)closeRelayAtIndex:(NSUInteger)index
 {
-    NSString *str = [NSString stringWithFormat:@"%2lu",(unsigned long)index];
+    NSString *str = [NSString stringWithFormat:@"%02lu",(unsigned long)index];
     NSData *data = [str dataUsingEncoding:NSASCIIStringEncoding];
     [self sendDataWithFunctionName:FUNCTION_NAME_CLOSE_RELAY data:data];
 }
@@ -1025,12 +1045,12 @@
         return ;
     }
     NSMutableData *data = [[NSMutableData alloc] init];
-    NSString *strChannel = [NSString stringWithFormat:@"%2lu",(unsigned long)channel];
+    NSString *strChannel = [NSString stringWithFormat:@"%02lu",(unsigned long)channel];
     [data appendData:[strChannel dataUsingEncoding:NSASCIIStringEncoding]];
     
     NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:channel];
     NSNumber *numIsOpen = [dict objectForKey:@"isOpenTimer"];
-    NSString *strOpen = [NSString stringWithFormat:@"%2d",[numIsOpen intValue]];
+    NSString *strOpen = [NSString stringWithFormat:@"%02d",[numIsOpen intValue]];
     [data appendData:[strOpen dataUsingEncoding:NSASCIIStringEncoding]];
     
     NSMutableArray *openDevice = [dict objectForKey:@"isOpenDevice"];
@@ -1038,7 +1058,7 @@
     for (int i = 0 ; i != 5; ++i )
     {
         NSNumber *numOpen = [openDevice objectAtIndexedSubscript:i];
-        NSString *strOpen = [NSString stringWithFormat:@"%2d",[numOpen intValue]];
+        NSString *strOpen = [NSString stringWithFormat:@"%02d",[numOpen intValue]];
         [data appendData:[strOpen dataUsingEncoding:NSASCIIStringEncoding]];
         
         NSString *strDate = [date objectAtIndexedSubscript:i];
@@ -1069,17 +1089,17 @@
         switch (ttmpig)
         {
             case 10:
-                nLetterValue =@"A";break;
+                nLetterValue =@"a";break;
             case 11:
-                nLetterValue =@"B";break;
+                nLetterValue =@"b";break;
             case 12:
-                nLetterValue =@"C";break;
+                nLetterValue =@"c";break;
             case 13:
-                nLetterValue =@"D";break;
+                nLetterValue =@"d";break;
             case 14:
-                nLetterValue =@"E";break;
+                nLetterValue =@"e";break;
             case 15:
-                nLetterValue =@"F";break;
+                nLetterValue =@"f";break;
             default:nLetterValue=[NSString stringWithFormat:@"%lli",ttmpig];
                 
         }
@@ -1161,6 +1181,8 @@
         [data appendData:[sec dataUsingEncoding:NSASCIIStringEncoding]];
         [data appendData:[weekday dataUsingEncoding:NSASCIIStringEncoding]];
         
+        //NSMutableData *testData = [[NSMutableData alloc] init];
+        //[testData appendData:[@"0d0a100a170303" dataUsingEncoding:NSASCIIStringEncoding]];
         [self sendDataWithFunctionName:FUNCTION_NAME_SET_SYS_DATETIME data:data];
         [data release];
         [gregorian release];
@@ -1187,5 +1209,21 @@
 - (void)didChangePassword
 {
     [self.changePasswordViewController didChangePassword];
+}
+
+- (void)logout
+{
+    if ( YES == [_socket isConnected] )
+    {
+        [_socket disconnect];
+        [_socket setDelegate:Nil];
+        [_socket release];
+        _socket = nil;
+    }
+    if ( ! self.loginViewController )
+    {
+        self.loginViewController = [[LoginViewController alloc] init];
+    }
+    [self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
 }
 @end

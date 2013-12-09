@@ -8,6 +8,7 @@
 
 #import "DeviceData.h"
 #import "Config.h"
+#import "LoginInfo.h"
 
 @implementation CDeviceData
 
@@ -60,10 +61,23 @@ static CDeviceData * _shareDeviceData;
         
         self.outsideTemp    = [NSNumber numberWithInt:999];
         self.insideTemp     = [NSNumber numberWithInt:999];
-        for (int i = 0; i != relayStatusCount; ++i)
+        
+        NSDictionary *dict = [[NSUserDefaults standardUserDefaults] objectForKey:USER_DEFAULT_KEY_DEVICE_NAME];
+        if ( dict )
         {
-            [_relayName addObject:[NSString stringWithFormat:@"继电器%d",i + 1]];
+            for (int i = 0; i != relayStatusCount; ++i)
+            {
+                [_relayName addObject:[dict objectForKey:[NSString stringWithFormat:@"%d",i]]];
+            }
         }
+        else
+        {
+            for (int i = 0; i != relayStatusCount; ++i)
+            {
+                [_relayName addObject:[NSString stringWithFormat:@"继电器%d",i + 1]];
+            }
+        }
+       
        
         for (int i = 0; i != ssCount; ++i)
         {
