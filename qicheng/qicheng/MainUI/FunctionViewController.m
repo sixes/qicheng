@@ -436,6 +436,20 @@
     
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self onTapIndex:_currentIdx];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    if ( _tempTimer )
+    {
+        [_tempTimer invalidate];
+        _tempTimer = Nil;
+    }
+}
+
 - (void)loadCurtainView
 {
     CGRect viewRt;
