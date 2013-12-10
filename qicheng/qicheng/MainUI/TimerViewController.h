@@ -21,10 +21,14 @@
     UIButton *_btnOpen;
     
     NSUInteger _selectedTableIdx;
+    
+    UISwitch *_swOpen;
+    
+    NSString *_channelName;
 }
 
-- (void)setChannel:(NSUInteger)channel;
+- (void)setChannel:(NSUInteger)channel channelName:(NSString*)name;
 - (void)updateOpenBtnStatus;
 - (void)didQueryAllTimerStatus;
-
+- (id)initAtChannel:(NSUInteger)channel ChannelName:(NSString*)name;
 @end

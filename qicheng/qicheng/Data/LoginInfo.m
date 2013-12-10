@@ -11,6 +11,7 @@
 @implementation CLoginInfo
 
 @synthesize bLogined        = _bLogined;
+@synthesize bShowLoginView  = _bShowLoginView;
 @synthesize loginDomain     = _strDomain;
 @synthesize loginIp         = _strIp;
 @synthesize loginModuleIdx  = _strModuleIdx;
@@ -36,6 +37,7 @@ static CLoginInfo * _shareLoginInfo;
         _strModuleIdx   = idx;
         _strPassword    = psw;
         _bLogined       = NO;
+        _bShowLoginView = NO;
     }
     return self
     ;

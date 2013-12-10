@@ -146,12 +146,21 @@
     NSUInteger functionNameIdx = [PROTOCOL_RECV_HEAD length] + LENGTH_MODULE_ADDR + LENGTH_DATA_LENGTH;
     if ( functionNameIdx >= [msg length] )
     {
-        assert(false);
+        //assert(false);
+        if ( NSOrderedSame == [msg compare:@"#" options:NSLiteralSearch range:NSMakeRange(0, [@"#" length])] && 1 == [msg length] )
+        {
+            return ;
+        }
+        else
+        {
+            assert(false);
+        }
     }
     NSString *functionName = [msg substringWithRange:NSMakeRange(functionNameIdx, LENGTH_FUNCTION_NAME)];
     if ( functionNameIdx + 1 >= [msg length] )
     {
         assert(false);
+        return ;
     }
     NSString *realData = [msg substringWithRange:NSMakeRange(functionNameIdx + 1, [msg length] - functionNameIdx - 1 - [PROTOCOL_RECV_TAIL length])];
     
@@ -249,6 +258,7 @@
             }
             break;
         case FUNCTION_INDEX_QUERY_ALL_RELAY_STATUS:
+        case FUNCTION_INDEX_SET_ALL_RELAY_STATUS:
             {
                 if ( LENGTH_QUERY_ALL_RELAY_STATUS == [msg length] )
                 {
@@ -384,9 +394,13 @@
                         //[[CDeviceData shareDeviceData].timerDict setValue:[NSNumber numberWithUnsignedChar:openValue] forKey:@"isOpen"];
                     }
 
-                    if ( [AppDelegate shareAppDelegate]._timerViewController )
+                    if ( [AppDelegate shareAppDelegate].timerViewController )
                     {
-                        [[AppDelegate shareAppDelegate]._timerViewController didQueryAllTimerStatus];
+                        [[AppDelegate shareAppDelegate].timerViewController didQueryAllTimerStatus];
+                    }
+                    if ( [AppDelegate shareAppDelegate].functionViewController )
+                    {
+                        [[AppDelegate shareAppDelegate].functionViewController didQueryAllTimerStatus];
                     }
                 }
                 else
@@ -545,8 +559,11 @@
         }
         if ( idx < [msg length] )
         {
-            rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
-            [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+            //rret = [msg rangeOfCharacterFromSet:cSet options:NSLiteralSearch range:NSMakeRange(idx, [msg length] - idx)];
+            if ( nil == [AppDelegate shareAppDelegate].readData )
+            {
+                [AppDelegate shareAppDelegate].readData = [[NSMutableData alloc] init];
+            }
             NSData *leftData = [[msg substringWithRange:NSMakeRange(idx, [msg length] - idx)] dataUsingEncoding:NSASCIIStringEncoding];
             [[AppDelegate shareAppDelegate].readData appendData:leftData];
         }
@@ -948,6 +965,7 @@
     //[_navController pushViewController: animated:NO];
     [self.navController presentViewController:self.loginViewController animated:NO completion:^{
     
+        [CLoginInfo shareLoginInfo].bShowLoginView = YES;
         if ( [strIp length] > 0 && [strPort length] > 0 && [strPwd length] > 0 && [strIdx length] > 0 )
         {
            //x [self onTapLogin:strIp psw:strPwd port:strPort moduleIdx:strIdx];
@@ -1088,6 +1106,14 @@
         NSString *min = [strDate substringWithRange:NSMakeRange(3, 2)];
         NSString *hr16 = [self ToHex:[hour intValue]];
         NSString *min16 = [self ToHex:[min intValue]];
+        if ( [hr16 length] < 2)
+        {
+            hr16 = [NSString stringWithFormat:@"0%@",hr16];
+        }
+        if ( [min16 length] < 2)
+        {
+            min16 = [NSString stringWithFormat:@"0%@",min16];
+        }
         [data appendData:[hr16 dataUsingEncoding:NSASCIIStringEncoding]];
         [data appendData:[min16 dataUsingEncoding:NSASCIIStringEncoding]];
     }
@@ -1235,6 +1261,13 @@
 
 - (void)logout
 {
+    if ( self.functionViewController )
+    {
+        self.functionViewController.bHadQueryAlarmCount     = NO;
+        self.functionViewController.bHadQueryRelayStatus    = NO;
+        self.functionViewController.bHadQuerySensorStatus   = NO;
+        self.functionViewController.bHadQueryTimerStatus    = NO;
+    }
     if ( YES == [_socket isConnected] )
     {
         [_socket disconnect];
@@ -1242,11 +1275,16 @@
         [_socket release];
         _socket = nil;
     }
-    if ( ! self.loginViewController )
+   
+    if ( NO == [CLoginInfo shareLoginInfo].bShowLoginView )
     {
-        self.loginViewController = [[LoginViewController alloc] init];
+        if ( ! self.loginViewController )
+        {
+            self.loginViewController = [[LoginViewController alloc] init];
+        }
+        [self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
     }
-    [self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
+    
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex

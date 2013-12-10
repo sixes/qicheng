@@ -25,19 +25,20 @@
     return self;
 }
 
-- (void)setChannel:(NSUInteger)channel
+- (id)initAtChannel:(NSUInteger)channel ChannelName:(NSString*)name
 {
-    _channel = channel;
-    NSString *strTitle;
-    if ( _channel < 7 )
+    if ( self = [super init] )
     {
-        strTitle = [NSString stringWithFormat:@"继电器%d",_channel];
+        _channel        = channel;
+        _channelName    = [name copy];
     }
-    else
-    {
-        strTitle = @"窗帘";
-    }
-    [_lblTitle setText:strTitle];
+    return self;
+}
+- (void)setChannel:(NSUInteger)channel channelName:(NSString*)name
+{
+    _channel        = channel;
+    _channelName    = name;
+   
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -49,12 +50,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [_datePicker setHidden:NO];
-   // [_timerTableView setEditing:YES];
-   // [_lblTitle setText:@"selected"];
     [_btnCancel setHidden:NO];
     [_btnDone setHidden:NO];
     [_btnNext setHidden:NO];
-    [_btnOpen setHidden:NO];
+//    [_btnOpen setHidden:NO];
     _selectedTableIdx = [indexPath row];
    
     [self updateOpenBtnStatus];
@@ -138,12 +137,20 @@
 
 - (void)loadView
 {
-    _timerTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height) style:UITableViewStyleGrouped];
-    self.view = _timerTableView;
-    //[self.view setFrame:CGRectMake(0, 80, 320, 640)];
+    UIImageView *bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height)];
+    self.view = bgView;
+    self.view.userInteractionEnabled = YES;
+    [bgView release];
+    
+    _timerTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 10, [AppDelegate shareAppDelegate].width, [AppDelegate shareAppDelegate].height) style:UITableViewStyleGrouped];
+   // self.view = _timerTableView;
+    [self.view addSubview:_timerTableView];
+   // [self.view setFrame:CGRectMake(0, 80, 320, 640)];
+    [_timerTableView release];
     
     CGRect btnOpenRt,btnDoneRt,btnCancelRt,btnNextRt,lblTitleRt;
     CGRect datePickerRt;
+    CGRect swOpenRt;
     if ( [AppDelegate shareAppDelegate].biPad )
     {
         btnOpenRt       = CGRectMake(0, 0, 200, 60);
@@ -159,9 +166,11 @@
         btnDoneRt       = CGRectMake(220, 0, 100, 30);
         btnCancelRt     = CGRectMake(0, 0, 100, 30);
         btnNextRt       = CGRectMake(220, 0, 100, 30);
-        datePickerRt    = CGRectMake(0, 230, 320, 120);
+        datePickerRt    = CGRectMake(0, 310, 320, 120);
         lblTitleRt      = CGRectMake(150, 0, 100, 30);
+        swOpenRt        = CGRectMake(10, 0, 100, 30);
     }
+    
     [_timerTableView setDataSource:self];
     [_timerTableView setDelegate:self];
     UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,80,[AppDelegate shareAppDelegate].width, 30)];
@@ -180,9 +189,10 @@
     _lblTitle   = [[UILabel alloc] initWithFrame:lblTitleRt];
     _btnDone    = [[UIButton alloc] initWithFrame:btnDoneRt];
     _btnNext    = [[UIButton alloc] initWithFrame:btnNextRt];
-    _btnOpen    = [[UIButton alloc] initWithFrame:btnOpenRt];
-    
-    [_timerTableView.tableHeaderView addSubview:_btnOpen];
+//    _btnOpen    = [[UIButton alloc] initWithFrame:btnOpenRt];
+    _swOpen     = [[UISwitch alloc] initWithFrame:swOpenRt];
+    //[_timerTableView.tableHeaderView addSubview:_btnOpen];
+    [_timerTableView.tableHeaderView addSubview:_swOpen];
     [_timerTableView.tableHeaderView addSubview:_lblTitle];
     [_timerTableView.tableHeaderView addSubview:_btnDone];
    
@@ -205,6 +215,23 @@
 - (void)onSetTime
 {
     NSLog(@"%@",[_datePicker date]);
+    if ( -1 == _selectedTableIdx )
+    {
+        return;
+    }
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setLocale:[NSLocale systemLocale]];
+    [formatter setDateFormat:@"HH:mm"];
+    NSString *strDate = [formatter stringFromDate:_datePicker.date];
+    NSLog(@"select DT:%@",strDate);
+    NSDictionary *dict = [[CDeviceData shareDeviceData].channelTimerStatus objectAtIndexedSubscript:_channel];
+    NSMutableArray *array = [dict objectForKey:@"dateArr"];
+    [array setObject:strDate atIndexedSubscript:_selectedTableIdx];
+    [formatter release];
+    
+    NSIndexPath *ip = [NSIndexPath indexPathForRow:_selectedTableIdx inSection:0];
+    NSArray *arr = [NSArray arrayWithObject:ip];
+    [_timerTableView reloadRowsAtIndexPaths:arr withRowAnimation:UITableViewRowAnimationNone];
 }
 
 - (void)viewDidLoad
@@ -226,22 +253,27 @@
     [_btnNext setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [_btnNext addTarget:self action:@selector(onBtnNext) forControlEvents:UIControlEventTouchUpInside];
     
-    [_btnOpen setTitle:@"开启" forState:UIControlStateNormal];
-    [_btnOpen setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [_btnOpen addTarget:self action:@selector(onBtnOpen) forControlEvents:UIControlEventTouchUpInside];
+    //[_btnOpen setTitle:@"开启" forState:UIControlStateNormal];
+    //[_btnOpen setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    //[_btnOpen addTarget:self action:@selector(onBtnOpen) forControlEvents:UIControlEventTouchUpInside];
     
+    [_lblTitle setText:_channelName];
+    [_lblTitle setText:_channelName];
     _selectedTableIdx = -1;
     
     [_btnDone setHidden:YES];
     [_btnCancel setHidden:YES];
     [_btnNext setHidden:YES];
-    [_btnOpen setHidden:YES];
+    //[_btnOpen setHidden:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [_timerTableView reloadData];
-    NSLog(@"willapp");
+    [_datePicker setHidden:YES];
+    [_btnCancel setHidden:YES];
+    [_btnNext setHidden:YES];
+    [_btnDone setHidden:YES];
 }
 
 - (void)onTapSwitch:(UISwitch*)sw
@@ -293,7 +325,7 @@
     [_btnCancel setHidden:YES];
     [_btnNext setHidden:YES];
     [_btnDone setHidden:YES];
-    [_btnOpen setHidden:YES];
+//    [_btnOpen setHidden:YES];
     [_datePicker setHidden:YES];
     [[AppDelegate shareAppDelegate] set5TimerAtChannel:_channel];
 }

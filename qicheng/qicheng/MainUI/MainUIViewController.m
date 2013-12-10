@@ -141,6 +141,7 @@
         break;
         case 4:
         {
+            
             [[AppDelegate shareAppDelegate] logout];
         }
         break;

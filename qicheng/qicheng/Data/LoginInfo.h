@@ -23,6 +23,7 @@ static NSString * const USER_DEFAULT_KEY_LOGIN_MODULEINDEX	= @"qicheng_login_mod
 @interface CLoginInfo : NSObject
 {
     BOOL _bLogined;
+    BOOL _bShowLoginView;
     
     NSString *_strDomain;
     NSString *_strIp;
@@ -31,6 +32,7 @@ static NSString * const USER_DEFAULT_KEY_LOGIN_MODULEINDEX	= @"qicheng_login_mod
     NSString *_strProt;
 }
 @property (nonatomic,assign) BOOL bLogined;
+@property (nonatomic,assign) BOOL bShowLoginView;
 @property (nonatomic,copy) NSString *loginDomain;
 @property (nonatomic,copy) NSString *loginIp;
 @property (nonatomic,copy) NSString *loginModuleIdx;

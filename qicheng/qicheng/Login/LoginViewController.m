@@ -238,6 +238,7 @@
     {
         [self.parentViewController dismissModalViewControllerAnimated:NO];
     }
+    [CLoginInfo shareLoginInfo].bShowLoginView = NO;
     //[[AppDelegate shareAppDelegate].navController popToRootViewControllerAnimated:YES];
     
 //    [self dismissViewControllerAnimated:YES completion:NULL];

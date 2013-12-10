@@ -37,6 +37,10 @@
 }
 
 @property (nonatomic,assign) BOOL bFilpped;
+@property (nonatomic,assign) BOOL bHadQuerySensorStatus;
+@property (nonatomic,assign) BOOL bHadQueryAlarmCount;
+@property (nonatomic,assign) BOOL bHadQueryTimerStatus;
+@property (nonatomic,assign) BOOL bHadQueryRelayStatus;
 @property (nonatomic,retain) iCarousel *carousel;
 @property (nonatomic,retain) NSMutableArray *items;
 @property (nonatomic,retain) NSMutableArray *curtainArray;
@@ -58,4 +62,5 @@
 - (void)didQueryAllRelayStatus;
 - (void)didQueryAlarmIsOpen;
 - (void)didQueryAllSensorStatus;
+- (void)didQueryAllTimerStatus;
 @end

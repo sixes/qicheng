@@ -43,6 +43,7 @@
 #define FUNCTION_INDEX_OPEN_CURTAIN				'e'
 #define FUNCTION_INDEX_OPEN_RELAY               'a'
 #define FUNCTION_INDEX_SET_5TIMER               'z'
+#define FUNCTION_INDEX_SET_ALL_RELAY_STATUS     'u'
 #define FUNCTION_INDEX_SET_SYS_DATETIME         't'
 #define FUNCTION_INDEX_STOP_CURTAIN				'f'
 #define FUNCTION_INDEX_QUERY_ALARM_IS_OPEN		'y'
@@ -64,6 +65,7 @@
 #define FUNCTION_NAME_OPEN_CURTAIN				@"e"
 #define FUNCTION_NAME_OPEN_RELAY                @"a"
 #define FUNCTION_NAME_SET_5_TIMER               @"z"
+#define FUNCTION_NAME_SET_ALL_RELAY_STATUS      @"u"
 #define FUNCTION_NAME_SET_SYS_DATETIME          @"t"
 #define FUNCTION_NAME_STOP_CURTAIN				@"f"
 #define FUNCTION_NAME_QUERY_ALARM_IS_OPEN		@"y"

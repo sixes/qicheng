@@ -1,3 +1,4 @@
+
 //
 //  FunctionViewController.m
 //  qicheng
@@ -20,6 +21,10 @@
 
 @implementation FunctionViewController
 
+@synthesize bHadQueryAlarmCount         = _bHadQueryAlarmCount;
+@synthesize bHadQueryRelayStatus        = _bHadQueryRelayStatus;
+@synthesize bHadQuerySensorStatus       = _bHadQuerySensorStatus;
+@synthesize bHadQueryTimerStatus        = _bHadQueryTimerStatus;
 @synthesize bFilpped = _bFlipped;
 @synthesize carousel = _carousel;
 @synthesize items = _items;
@@ -199,7 +204,7 @@
         break;
         case 5:
         {
-            return [[CDeviceData shareDeviceData].relayStatus count] + [self.curtainArray count];
+            return [[CDeviceData shareDeviceData].channelTimerStatus count];
         }
         break;
         default:
@@ -228,7 +233,7 @@
                 break;
         }
         cell.backgroundColor = [UIColor clearColor];
-        [cell.detailTextLabel setTextColor:[UIColor yellowColor]];
+        
         [cell.textLabel setTextColor:[UIColor yellowColor]];
         CGFloat fontSz;
         CGRect swRt;
@@ -250,8 +255,10 @@
         cell.accessoryView = sw;
         [sw release];
     }
+    
     UISwitch *sw = (UISwitch*)cell.accessoryView;
     sw.tag = [indexPath row];
+    [cell.detailTextLabel setTextColor:[UIColor yellowColor]];
     
     switch ( _currentIdx )
     {
@@ -306,10 +313,12 @@
                 if ( [num integerValue] > 0 )
                 {
                     cell.detailTextLabel.text = @"正常状态";
+                    
                 }
                 else
                 {
                     cell.detailTextLabel.text = @"报警状态";
+                    [cell.detailTextLabel setTextColor:[UIColor redColor]];
                 }
                 NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
                 UIImage *theImage = [UIImage imageWithContentsOfFile:path];
@@ -325,20 +334,24 @@
                 case 0:
                 {
                     cell.textLabel.text = @"报警";
+                    UISwitch *sw = (UISwitch*)cell.accessoryView;
+                    [sw setHidden:NO];
                     if ( YES == [CDeviceData shareDeviceData].bAlarmOpen )
                     {
+                        sw.on = YES;
                         cell.detailTextLabel.text = @"已启动";
                     }
                     else
                     {
+                        sw.on = NO;
                         cell.detailTextLabel.text = @"已关闭";
                     }
-                    [cell.accessoryView setHidden:NO];
+//                    [cell.accessoryView setHidden:NO];
                     NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
                     UIImage *theImage = [UIImage imageWithContentsOfFile:path];
                     cell.imageView.image = theImage;
                 }
-                    break;
+                break;
                 default:
                 {
                     [cell.accessoryView setHidden:YES];
@@ -347,7 +360,7 @@
                         NSLog(@"%ld rowrow:",(long)indexPath.row);
                         cell.textLabel.text = [[CDeviceData shareDeviceData].sensorName objectAtIndex:indexPath.row - 1];
                         int count = [[[CDeviceData shareDeviceData].alarmCount objectAtIndexedSubscript:indexPath.row - 1] unsignedLongValue];
-                        cell.detailTextLabel.text = [NSString stringWithFormat:@"报警%ld次",count];
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"报警%d次",count];
                     }
                     NSString *path = [[NSBundle mainBundle] pathForResource:@"device_control_shade_on" ofType:@"png"];
                     UIImage *theImage = [UIImage imageWithContentsOfFile:path];
@@ -380,13 +393,13 @@
         break;
         case 5:
         {
-            if ( indexPath.row < [[CDeviceData shareDeviceData].relayStatus count] )
+            if ( indexPath.row < [[CDeviceData shareDeviceData].channelTimerStatus count] - 1 )
             {
                 cell.textLabel.text = [[CDeviceData shareDeviceData].relayName objectAtIndex:indexPath.row];
             }
             else
             {
-                cell.textLabel.text =  [self.curtainArray objectAtIndex:indexPath.row - [[CDeviceData shareDeviceData].relayStatus count]];
+                cell.textLabel.text = @"窗帘";// [self.curtainArray objectAtIndex:indexPath.row - [[CDeviceData shareDeviceData].relayStatus count]];
             }
             [cell.accessoryView setHidden:YES];
             cell.detailTextLabel.text = @"";
@@ -563,14 +576,15 @@
         break;
         case 5:
         {
-            
+            UITableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
                     if ( ! [AppDelegate shareAppDelegate].timerViewController )
                     {
                         [AppDelegate shareAppDelegate].timerViewController = [[TimerViewController alloc] init];
                     }
-                    [[AppDelegate shareAppDelegate].timerViewController setChannel:indexPath.row];
+            
                     [[AppDelegate shareAppDelegate].navController setNavigationBarHidden:NO animated:YES];
                     [[AppDelegate shareAppDelegate].navController pushViewController:[AppDelegate shareAppDelegate].timerViewController animated:YES];
+                    [[AppDelegate shareAppDelegate].timerViewController setChannel:indexPath.row channelName:cell.textLabel.text];
             
             
         }
@@ -657,22 +671,7 @@
             _tempTimer = nil;
         }
     }
-    switch ( index )
-    {
-        case 0:
-        {
- 
-        }
-        break;
-        //sensor
-        case 2:
-        {
-            
-        }
-        break;
-        default:
-            break;
-    }
+
     if ( YES == _bFlipped )
     {
         [self onTapBack];
@@ -910,6 +909,10 @@
 
 - (void)didOpenRelayAtIndex:(NSInteger)index
 {
+    if ( index >= [[CDeviceData shareDeviceData].relayStatus count] )
+    {
+        return ;
+    }
     [[CDeviceData shareDeviceData].relayStatus setObject:[NSNumber numberWithUnsignedLong:1] atIndexedSubscript:index];
    // NSLog(@"relay status size:%d",[[CDeviceData shareDeviceData].relayStatus count]);
     [_tableView reloadData];
@@ -917,6 +920,10 @@
 
 - (void)didCloseRelayAtIndex:(NSInteger)index
 {
+    if ( index >= [[CDeviceData shareDeviceData].relayStatus count] )
+    {
+        return ;
+    }
     [[CDeviceData shareDeviceData].relayStatus setObject:[NSNumber numberWithUnsignedLong:0] atIndexedSubscript:index];
     [_tableView reloadData];
 }
@@ -957,5 +964,10 @@
 - (void)didQueryAllSensorStatus
 {
     [self updateTableData];      
+}
+
+- (void)didQueryAllTimerStatus
+{
+    [self updateTableData];
 }
 @end
