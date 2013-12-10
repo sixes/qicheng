@@ -25,6 +25,6 @@
 
 - (void)setChannel:(NSUInteger)channel;
 - (void)updateOpenBtnStatus;
-
+- (void)didQueryAllTimerStatus;
 
 @end

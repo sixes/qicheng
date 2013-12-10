@@ -331,7 +331,10 @@
     }
     [[NSUserDefaults standardUserDefaults] setValue:dict forKey:USER_DEFAULT_KEY_DEVICE_NAME];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
+    if ( [AppDelegate shareAppDelegate].functionViewController )
+    {
+        [[AppDelegate shareAppDelegate].functionViewController updateTableData];
+    }
     UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"提示信息"
                                                     message:@"保存成功"
                                                    delegate:nil

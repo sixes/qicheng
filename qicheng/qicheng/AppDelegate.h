@@ -19,7 +19,7 @@
 #import "TimerViewController.h"
 #import "ChangePasswodViewController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate,UINavigationControllerDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate,UINavigationControllerDelegate,UIAlertViewDelegate>
 {
     
     ChangePasswodViewController *_changePasswordViewController;

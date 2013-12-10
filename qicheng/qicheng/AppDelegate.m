@@ -175,7 +175,7 @@
         case FUNCTION_INDEX_INCORRECT_INSTRUCTION:
         {
             UIAlertView * alert = [[UIAlertView alloc]initWithTitle:@"错误"
-                                                            message:@"指令错误"
+                                                            message:@"指令错误,请重新登录"
                                                            delegate:self
                                                   cancelButtonTitle:@"OK"
                                                   otherButtonTitles:nil];
@@ -270,6 +270,11 @@
                     [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay5status] atIndexedSubscript:5];
                     [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay6status] atIndexedSubscript:6];
                     [[CDeviceData shareDeviceData].relayStatus setObject:(id)[NSNumber numberWithUnsignedLong:relay7status] atIndexedSubscript:7];
+
+                    if ( [AppDelegate shareAppDelegate].functionViewController )
+                    {
+                        [[AppDelegate shareAppDelegate].functionViewController didQueryAllRelayStatus];
+                    }
                 }
                 else
                 {
@@ -292,6 +297,10 @@
                     [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm1count] atIndexedSubscript:1];
                     [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm2count] atIndexedSubscript:2];
                     [[CDeviceData shareDeviceData].alarmCount setObject:(id)[NSNumber numberWithUnsignedLong:alarm3count] atIndexedSubscript:3];
+                    if ( [AppDelegate shareAppDelegate].functionViewController )
+                    {
+                        [[AppDelegate shareAppDelegate].functionViewController didUpdateAlarmCount];
+                    }
                 }
                 else
                 {
@@ -316,7 +325,10 @@
                         NSLog(@"alarm is closed");
                         [CDeviceData shareDeviceData].bAlarmOpen = NO;
                     }
-                    
+                    if ( [AppDelegate shareAppDelegate].functionViewController )
+                    {
+                        [[AppDelegate shareAppDelegate].functionViewController didQueryAlarmIsOpen];
+                    }
                 }
                 else
                 {
@@ -371,6 +383,11 @@
                         [[CDeviceData shareDeviceData].channelTimerStatus setObject:dict atIndexedSubscript:i];
                         //[[CDeviceData shareDeviceData].timerDict setValue:[NSNumber numberWithUnsignedChar:openValue] forKey:@"isOpen"];
                     }
+
+                    if ( [AppDelegate shareAppDelegate]._timerViewController )
+                    {
+                        [[AppDelegate shareAppDelegate]._timerViewController didQueryAllTimerStatus];
+                    }
                 }
                 else
                 {
@@ -393,6 +410,11 @@
                     [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor1status] atIndexedSubscript:1];
                     [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor2status] atIndexedSubscript:2];
                     [[CDeviceData shareDeviceData].sensorStatus setObject:(id)[NSNumber numberWithUnsignedLong:sensor3status] atIndexedSubscript:3];
+
+                    if ( [AppDelegate shareAppDelegate].functionViewController )
+                    {
+                        [[AppDelegate shareAppDelegate].functionViewController didQueryAllSensorStatus];
+                    }
                 }
                 else
                 {
@@ -1225,5 +1247,13 @@
         self.loginViewController = [[LoginViewController alloc] init];
     }
     [self.navController presentViewController:self.loginViewController animated:YES completion:NULL];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if ( 0 == buttonIndex )
+    {
+        [self logout];
+    }
 }
 @end

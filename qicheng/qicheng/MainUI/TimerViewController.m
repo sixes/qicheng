@@ -334,7 +334,10 @@
     }
 }
 
-
+- (void)didQueryAllTimerStatus
+{
+    [_timerTableView reloadData];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

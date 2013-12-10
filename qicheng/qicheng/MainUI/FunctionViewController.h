@@ -53,4 +53,9 @@
 - (void)didOpenRelayAtIndex:(NSInteger)index;
 - (void)didCloseRelayAtIndex:(NSInteger)index;
 - (void)didUpdateTemp;
+- (void)updateTableData;
+- (void)didUpdateAlarmCount;
+- (void)didQueryAllRelayStatus;
+- (void)didQueryAlarmIsOpen;
+- (void)didQueryAllSensorStatus;
 @end

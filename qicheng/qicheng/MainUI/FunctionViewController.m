@@ -935,4 +935,27 @@
 {
     [_tableView reloadData];
 }
+
+- (void)updateTableData
+{
+    [_tableView reloadData];
+}
+
+- (void)didUpdateAlarmCount
+{
+    [self updateTableData];
+}
+
+- (void)didQueryAllRelayStatus
+{
+    [self updateTableData];
+}
+- (void)didQueryAlarmIsOpen
+{
+    [self updateTableData];   
+}
+- (void)didQueryAllSensorStatus
+{
+    [self updateTableData];      
+}
 @end
